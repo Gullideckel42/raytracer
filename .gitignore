@@ -1,0 +1,7 @@
+premake5.exe
+premake5.lua
+vendor/
+.vs/
+bin/
+bin-int/
+Raytracer/Raytracer.vcxproj.user
