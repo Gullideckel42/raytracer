@@ -3,9 +3,15 @@
 
 // Standard headers
 #include <iostream>
+#include <string>
 #include <stdio.h>
 #include <memory>
 #include <vector>
+
+// Glew
+#define GLEW_STATIC
+#include <GL/glew.h>
+
 
 #define RT_ ::rt::
 #define RT_START namespace rt {
@@ -15,3 +21,5 @@
 #else
 #define CORE_ASSERT(x) x
 #endif
+
+typedef bool RT_Result;

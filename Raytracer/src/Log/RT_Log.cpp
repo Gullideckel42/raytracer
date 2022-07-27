@@ -1,6 +1,6 @@
 //#include "RT_Log.hpp"
 
-// Imlementation found in the header file
+// Implementation found in the header file (RT_Log.hpp)
 
 /*
 template <typename T>

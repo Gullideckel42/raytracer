@@ -13,9 +13,11 @@
   <ItemGroup>
     <ClCompile Include="src\Log\RT_Log.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\UI\RT_Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core.hpp" />
+    <ClInclude Include="src\UI\RT_Window.hpp" />
     <ClInclude Include="src\Log\RT_Log.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

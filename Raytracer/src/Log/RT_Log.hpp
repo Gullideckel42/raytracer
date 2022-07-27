@@ -54,7 +54,7 @@ namespace log {
 			std::cout << color << "[" << levels[(int)level] << "]  ";
 		}
 		
-		std::cout << msg << " ";
+		std::cout << msg;
 		log(level, false, msgs...);
 	}
 
