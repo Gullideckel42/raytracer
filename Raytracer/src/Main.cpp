@@ -14,8 +14,12 @@
 int main()
 {
 	
-	rt::log::log(rt::log::LogLevel::ERROR, true, "asd", 2);
-	rt::log::log(rt::log::LogLevel::INFO, true, "OpenGL Version: ", 23.2, "->", false);
+	
+	rt_info("Started Raytracer: ", true);
+	rt_warn("Renderer Timeout: ", 323, "ms");
+	rt_error("Failed rendering frame! id:", 912992);
+	rt_fatal("Segmentation fault", 2323, "MB", false);
+
 	std::cout << "Jo" << std::endl;
  	return 0;
 }

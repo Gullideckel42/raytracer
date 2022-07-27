@@ -4,6 +4,17 @@
 
 RT_START
 
+#ifdef RT_DEBUG
+#define rt_info(...) RT_ log::log(RT_ log::LogLevel::INFO, true, __VA_ARGS__);
+#define rt_warn(...) RT_ log::log(RT_ log::LogLevel::WARNING, true, __VA_ARGS__);
+#define rt_error(...) RT_ log::log(RT_ log::LogLevel::ERROR, true, __VA_ARGS__);
+#define rt_fatal(...) RT_ log::log(RT_ log::LogLevel::FATAL, true, __VA_ARGS__);
+#else
+#define rt_info(...)
+#define rt_warn(...)
+#define rt_error(...)
+#define rt_fatal(...)
+#endif
 namespace log {
 
 #ifdef RT_PLATFORM_WINDOWS
@@ -11,7 +22,7 @@ namespace log {
 	constexpr char* green = "\033[92m";
 	constexpr char* yellow = "\033[93m";
 	constexpr char* red = "\033[91m";
-	constexpr char* colors[] = { reset, green, yellow, red };
+	constexpr char* colors[] = { reset, green, yellow, red, red };
 	
 
 #else
@@ -25,7 +36,7 @@ namespace log {
 		FATAL = 4
 	};
 
-	constexpr char* levels[] = { "", "INFO", "WARNING", "ERROR", "FATAL"};
+	constexpr char* levels[] = { "", " INFO  ", "WARNING", " ERROR ", " FATAL "};
 
 	template <typename T>
 	void log(LogLevel level, bool s, T msg)
