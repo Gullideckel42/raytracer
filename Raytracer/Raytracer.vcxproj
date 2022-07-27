@@ -11,7 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Log\RT_Log.cpp" />
     <ClCompile Include="src\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core.hpp" />
+    <ClInclude Include="src\Log\RT_Log.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{32530D40-9EBD-C1B6-E7FB-725C53A59F0B}</ProjectGuid>
