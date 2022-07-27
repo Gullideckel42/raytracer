@@ -1,5 +1,6 @@
 #include "RT_Window.hpp"
 
+
 bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensions)
 {
 	if (m_allocated) return false;
@@ -37,6 +38,29 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 	m_size.height = dimensions.height;
 	m_title = title;
 
+	// Init Dear ImGui
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+
+	ImGuiIO& m_imguiIO = ImGui::GetIO();
+	m_imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	m_imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	
+#ifdef RT_PLATFORM_WINDOWS
+	//m_imguiIO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+#else
+#error Windows!!!
+#endif
+
+	m_imguiIO.FontDefault = m_imguiIO.Fonts->AddFontFromFileTTF("assets/font/OpenSans/OpenSans-ExtraBold.ttf", 16.0f);
+
+
+	ImGui::StyleColorsDark();
+	ImGui_ImplGlfw_InitForOpenGL(m_window, true);
+	ImGui_ImplOpenGL3_Init("#version 130");
+
+
 	m_allocated = true;
 	rt_info("Created window(", m_size.width, "x", m_size.height, ") successful");
 	return true;
@@ -45,7 +69,9 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 void RT_ ui::Window::destroy()
 {
 	if (!m_allocated) return;
-
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 	if(m_window)
 	glfwDestroyWindow(m_window);
 	m_window = nullptr;
@@ -71,7 +97,24 @@ void RT_ ui::Window::startMainLoop(std::function<void(double)> f)
 	while (!glfwWindowShouldClose(m_window))
 	{
 		auto start = std::chrono::high_resolution_clock::now();
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+
 		f(frametime);
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		ImGuiIO& io = ImGui::GetIO();
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 		auto end = std::chrono::high_resolution_clock::now();

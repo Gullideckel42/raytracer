@@ -1,10 +1,15 @@
 #pragma once
 
 #include "../Core.hpp"
-#include "../Log/RT_Log.hpp"
+
 #include "GLFW/glfw3.h"
 #include <functional>
 #include <chrono>
+
+#include "../imgui-docking/imgui.h"
+#include "../imgui-docking/imgui_impl_glfw.h"
+#include "../imgui-docking/imgui_impl_opengl3.h"
+
 RT_START
 
 namespace ui

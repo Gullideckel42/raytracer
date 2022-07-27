@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Log">
+      <UniqueIdentifier>{E704880B-530E-887C-DC89-9E7C4892937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui-docking">
+      <UniqueIdentifier>{6C503BBE-D810-B7F4-A14B-00720DCBFBD0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core.hpp" />
+    <ClInclude Include="src\Log\RT_Log.hpp">
+      <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\GUI.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UI\RT_Window.hpp">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imconfig.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui_impl_glfw.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui_internal.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imstb_rectpack.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imstb_textedit.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imstb_truetype.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="src\Renderer\RT_Renderer.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Log\RT_Log.cpp">
+      <Filter>Log</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\UI\RT_Window.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_demo.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_draw.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_impl_glfw.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_impl_opengl3.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_tables.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\imgui_widgets.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

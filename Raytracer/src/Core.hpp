@@ -23,3 +23,5 @@
 #endif
 
 typedef bool RT_Result;
+
+#include "Log/RT_Log.hpp"

@@ -1,5 +1,4 @@
 #pragma once
-#include "../Core.hpp"
 
 
 RT_START
@@ -23,8 +22,6 @@ namespace log {
 	constexpr char* yellow = "\033[93m";
 	constexpr char* red = "\033[91m";
 	constexpr char* colors[] = { reset, green, yellow, red, red };
-	
-
 #else
 #error Only windows currently supported
 #endif
@@ -59,6 +56,5 @@ namespace log {
 	}
 
 }
-
 
 RT_END

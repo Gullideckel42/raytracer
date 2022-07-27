@@ -10,16 +10,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\Log\RT_Log.cpp" />
-    <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\UI\RT_Window.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\Core.hpp" />
-    <ClInclude Include="src\UI\RT_Window.hpp" />
-    <ClInclude Include="src\Log\RT_Log.hpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{32530D40-9EBD-C1B6-E7FB-725C53A59F0B}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
@@ -102,6 +92,34 @@
       <AdditionalLibraryDirectories>..\vendor\glew-2.1.0\lib\Release\x64;..\vendor\GLFW\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Core.hpp" />
+    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="src\Log\RT_Log.hpp" />
+    <ClInclude Include="src\Renderer\RT_Renderer.hpp" />
+    <ClInclude Include="src\UI\GUI.hpp" />
+    <ClInclude Include="src\UI\RT_Window.hpp" />
+    <ClInclude Include="src\imgui-docking\imconfig.h" />
+    <ClInclude Include="src\imgui-docking\imgui.h" />
+    <ClInclude Include="src\imgui-docking\imgui_impl_glfw.h" />
+    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3.h" />
+    <ClInclude Include="src\imgui-docking\imgui_internal.h" />
+    <ClInclude Include="src\imgui-docking\imstb_rectpack.h" />
+    <ClInclude Include="src\imgui-docking\imstb_textedit.h" />
+    <ClInclude Include="src\imgui-docking\imstb_truetype.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Log\RT_Log.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\UI\RT_Window.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_demo.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_draw.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_impl_glfw.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_tables.cpp" />
+    <ClCompile Include="src\imgui-docking\imgui_widgets.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

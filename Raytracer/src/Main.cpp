@@ -1,8 +1,9 @@
 #include <iostream>
 
+#include "UI/GUI.hpp"
 
-#include "Log/RT_Log.hpp"
 #include "UI/RT_Window.hpp"
+
 
 RT_START
 
@@ -13,12 +14,17 @@ void mainloop(double);
 void init(float width, float height)
 {
     CORE_ASSERT(w.create("Title", { width, height }));
+    ui::setDarkTheme();
     w.startMainLoop(mainloop);
 }
 
 void mainloop(double frametime)
 {
-    
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    ui::propertiesPanel();
+    ui::sceneView();
 }
 
 void dispose()
@@ -33,10 +39,10 @@ RT_END
  * 
  * 
  */
-int main()
+int main(int argc, char** argv)
 {
-
-    rt::init(1280, 720);
+    
+    rt::init(1600, 900);
     rt::dispose();
 
 
