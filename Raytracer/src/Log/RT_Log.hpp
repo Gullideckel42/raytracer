@@ -1,5 +1,5 @@
 #pragma once
-
+#include <ctime>
 
 RT_START
 
@@ -39,6 +39,18 @@ namespace log {
 	void log(LogLevel level, bool s, T msg)
 	{
 		const char* color = colors[(int)level];
+		if (s)
+		{
+#pragma warning( disable : 4244)
+#pragma warning( disable : 4996)
+			std::time_t t = std::time(0);
+			std::tm* now = std::localtime(&t);
+			std::cout << color << "[" << levels[(int)level] << " "
+				<< ((now->tm_hour<10)?"0":"") << now->tm_hour << ":"
+				<< ((now->tm_min < 10) ? "0" : "") << now->tm_min << ":"
+				<< ((now->tm_sec < 10) ? "0" : "") << now->tm_sec << "]  ";
+		}
+
 		std::cout << color << msg << reset << std::endl;
 	}
 
@@ -48,7 +60,14 @@ namespace log {
 		const char* color = colors[(int)level];
 		if (s)
 		{
-			std::cout << color << "[" << levels[(int)level] << "]  ";
+#pragma warning( disable : 4244)
+#pragma warning( disable : 4996)
+			std::time_t t = std::time(0);
+			std::tm* now = std::localtime(&t);
+			std::cout << color << "[" << levels[(int)level] << " "
+				<< ((now->tm_hour < 10) ? "0" : "") << now->tm_hour << ":"
+				<< ((now->tm_min < 10) ? "0" : "") << now->tm_min << ":"
+				<< ((now->tm_sec < 10) ? "0" : "") << now->tm_sec << "]  ";
 		}
 		
 		std::cout << msg;

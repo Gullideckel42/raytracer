@@ -4,6 +4,9 @@
     <Filter Include="Log">
       <UniqueIdentifier>{E704880B-530E-887C-DC89-9E7C4892937C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{7CCE658F-689B-C09A-91B4-AE427DE0F528}</UniqueIdentifier>
+    </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
     </Filter>
@@ -15,6 +18,9 @@
     <ClInclude Include="src\Core.hpp" />
     <ClInclude Include="src\Log\RT_Log.hpp">
       <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RT_Renderer.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\UI\GUI.hpp">
       <Filter>UI</Filter>
@@ -34,6 +40,9 @@
     <ClInclude Include="src\imgui-docking\imgui_impl_opengl3.h">
       <Filter>imgui-docking</Filter>
     </ClInclude>
+    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3_loader.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
     <ClInclude Include="src\imgui-docking\imgui_internal.h">
       <Filter>imgui-docking</Filter>
     </ClInclude>
@@ -46,8 +55,23 @@
     <ClInclude Include="src\imgui-docking\imstb_truetype.h">
       <Filter>imgui-docking</Filter>
     </ClInclude>
-    <ClInclude Include="src\imgui-docking\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="src\Renderer\RT_Renderer.hpp" />
+    <ClInclude Include="src\GLAPI\ThirdParty\stb\stb_image.h" />
+    <ClInclude Include="src\GLAPI\ThirdParty\OBJ_Loader.h" />
+    <ClInclude Include="src\GLAPI\GLapi.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_ComputeShader.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_CubeDepthMap.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_EquirectangularMap.h" />
+    <ClInclude Include="src\GLAPI\GLapi_Framebuffer.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_GLerror.h" />
+    <ClInclude Include="src\GLAPI\GLapi_IndexBuffer.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_Mesh.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_Shader.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_Texture.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_Vertex.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi_VertexBuffer.hpp" />
+    <ClInclude Include="src\Renderer\RT_Object.hpp" />
+    <ClInclude Include="src\Renderer\RT_Material.hpp" />
+    <ClInclude Include="src\Renderer\RT_Camera.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Log\RT_Log.cpp">
@@ -78,5 +102,19 @@
     <ClCompile Include="src\imgui-docking\imgui_widgets.cpp">
       <Filter>imgui-docking</Filter>
     </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_ComputeShader.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_CubeDepthMap.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_EquirectangularMap.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_Framebuffer.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_IndexBuffer.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_Mesh.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_Shader.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_Texture.cpp" />
+    <ClCompile Include="src\GLAPI\GLapi_VertexBuffer.cpp" />
+    <ClCompile Include="src\Renderer\RT_Object.cpp" />
+    <ClCompile Include="src\Renderer\RT_Camera.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\shader\GeometryPass.shader" />
   </ItemGroup>
 </Project>

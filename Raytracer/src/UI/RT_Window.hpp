@@ -26,7 +26,12 @@ namespace ui
 	{
 	public:
 
-		RT_Result create(std::string title, RT_ ui::WindowDimensions dimensions);
+		RT_Result create(std::string title, RT_ ui::WindowDimensions dimensions,
+			void (*keyCallback)(GLFWwindow* w, int key, int scancode, int action, int mods),
+			void (*cursorCallback)(GLFWwindow* w, double xpos, double ypos),
+			void (*mouseCallback)(GLFWwindow* w, int button, int action, int mods),
+			void (*scrollCallback) (GLFWwindow* window, double xoffset, double yoffset)
+			);
 		void destroy();
 
 		WindowDimensions getDimensions() { return m_size; }

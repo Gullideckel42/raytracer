@@ -1,7 +1,12 @@
 #include "RT_Window.hpp"
 
 
-bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensions)
+bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensions,
+	void (*keyCallback)(GLFWwindow* w, int key, int scancode, int action, int mods),
+	void (*cursorCallback)(GLFWwindow* w, double xpos, double ypos),
+	void (*mouseCallback)(GLFWwindow* w, int button, int action, int mods),
+	void (*scrollCallback) (GLFWwindow* window, double xoffset, double yoffset)
+	)
 {
 	if (m_allocated) return false;
 
@@ -11,7 +16,8 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 		rt_fatal("GLFW Initialization failed");
 		return false;
 	}
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
 	m_window = glfwCreateWindow(dimensions.width, dimensions.height, title.data(), nullptr, nullptr);
 
@@ -33,6 +39,10 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 
 	rt_info("OpenGL API Version: ", glGetString(GL_VERSION));
 
+	setKeyCallback(keyCallback);
+	setCursorCallback(cursorCallback);
+	glfwSetMouseButtonCallback(m_window, mouseCallback);
+	glfwSetScrollCallback(m_window, scrollCallback);
 
 	m_size.width = dimensions.width;
 	m_size.height = dimensions.height;
@@ -46,14 +56,13 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 	ImGuiIO& m_imguiIO = ImGui::GetIO();
 	m_imguiIO.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	m_imguiIO.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
-	
 #ifdef RT_PLATFORM_WINDOWS
-	//m_imguiIO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+	m_imguiIO.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 #else
 #error Windows!!!
 #endif
 
-	m_imguiIO.FontDefault = m_imguiIO.Fonts->AddFontFromFileTTF("assets/font/OpenSans/OpenSans-ExtraBold.ttf", 16.0f);
+	m_imguiIO.FontDefault = m_imguiIO.Fonts->AddFontFromFileTTF("assets/font/OpenSans/OpenSans-ExtraBold.ttf", 15.5f);
 
 
 	ImGui::StyleColorsDark();
@@ -107,7 +116,7 @@ void RT_ ui::Window::startMainLoop(std::function<void(double)> f)
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		ImGuiIO& io = ImGui::GetIO();
-
+#ifdef RT_PLATFORM_WINDOWS
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -115,8 +124,10 @@ void RT_ ui::Window::startMainLoop(std::function<void(double)> f)
 			ImGui::RenderPlatformWindowsDefault();
 			glfwMakeContextCurrent(backup_current_context);
 		}
+#endif
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
+		std::this_thread::sleep_for(std::chrono::milliseconds((unsigned int)2));
 		auto end = std::chrono::high_resolution_clock::now();
 		long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		frametime = (double)elapsed;

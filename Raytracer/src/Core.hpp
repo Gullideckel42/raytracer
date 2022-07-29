@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <memory>
 #include <vector>
-
+#include <thread>
 // Glew
 #define GLEW_STATIC
 #include <GL/glew.h>
