@@ -140,7 +140,19 @@ namespace ui {
 
             if (ImGui::TreeNode("Rendering"))
             {
-
+                ImGui::Checkbox("Visible", &obj->visible());
+                ImGui::Checkbox("Smooth", &obj->smooth());
+                ImGui::Checkbox("Wireframe", &obj->Wireframe());
+                ImGui::Checkbox("Face culling", &obj->backfaceCulling());
+                ImGui::SameLine();
+                int faceCullRadioButton = (int)obj->cullMode();
+                if (ImGui::RadioButton("Clockwise", &faceCullRadioButton, 0)) {
+                    obj->cullMode() = (bool)faceCullRadioButton;
+                }
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Counterclockwise", &faceCullRadioButton, 1)) {
+                    obj->cullMode() = (bool)faceCullRadioButton;
+                }
                 ImGui::TreePop();
             }
             if (ImGui::TreeNode("Material"))
