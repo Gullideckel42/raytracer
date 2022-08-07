@@ -16,7 +16,7 @@ namespace h3dgl {
         bool m_DepthStencilBuffer;
     public:
 
-        void load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer);
+        void load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer, GLuint format=GL_RGBA16F);
 
         void destroy();
 

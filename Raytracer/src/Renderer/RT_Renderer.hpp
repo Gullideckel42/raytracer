@@ -8,6 +8,27 @@ RT_START
 // The realtime renderer
 namespace renderer {
 
+	struct Viewport
+	{
+		glm::vec2 pos;
+		glm::vec2 size;
+	};
+
+	
+
+	struct RendererProperties
+	{
+		Viewport viewport = {};
+		float gamma = 2.0f;
+		float exposure = 3.2f;
+		float ambient = 0.01f;
+
+		glm::vec3 filter = {1,1,1 };
+		float saturation = 1.0f;
+	};
+
+	RendererProperties properties;
+
 	GL_ Framebuffer gBuffer;
 	GL_ Shader gShader;
 
@@ -22,9 +43,13 @@ namespace renderer {
 	std::vector <GL_ Mesh> meshes;
 	std::vector<RT_ Object> objects;
 
+	GL_ ComputeShader compute;
+
 	void init(float rwidth, float rheight)
 	{
 
+
+		properties.viewport = { {0,0}, {rwidth, rheight} };
 
 		// Cube & Quad
 
@@ -44,21 +69,28 @@ namespace renderer {
 
 		// Object
 		meshes.push_back(GL_ Mesh());
+		meshes.push_back(GL_ Mesh());
 		objects.push_back(RT_ Object());
 		GL_ Vertex v[] = H3D_NORMAL_CUBE_VERTICES(1, 1, 1);
 		meshes[0].loadFromFile("assets/model/hirsch.obj");
-		objects.at(0).create("Cube", &meshes[0], { {0,1,0}, 0.4f, 0.6f });
+		meshes[1].loadFromFile("assets/model/sphere.obj");
+		objects.at(0).create("Cube", &meshes[0], { {0.1,1,0.4}, 0.2f, 0.0f });
 		objects.at(0).getPosition().z = -6;
 		objects.at(0).updateTransform();
 		objects.push_back(RT_ Object());
-		objects.at(1).create("Cube2", &meshes[0], { {1,0,0}, 0.4f, 0.6f });
+		objects.at(1).create("Cube2", &meshes[0], { {1,0.2,0.2}, 0.1f, 1.0f });
 		objects.at(1).getPosition() = {2, -1, -5};
 		objects.at(1).updateTransform();
+
+		objects.push_back(RT_ Object());
+		objects.at(2).create("Sphere", &meshes[1], { {1,0.3,0.1}, 0.4f, 0.0f });
+		objects.at(2).getPosition() = { -2, 1, -3 };
+		objects.at(2).updateTransform();
 
 
 		// Camera
 		c.create(90.0, rwidth, rheight, 0.1, 100.0);
-		rt_info("Created perspective camera (FOV: ", 90.0f, "°)");
+		rt_info("Created perspective camera (FOV: ", 90.0f, " Degree)");
 
 		GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
 		gBuffer.load(rwidth, rheight, 4, attachments, true);
@@ -67,15 +99,25 @@ namespace renderer {
 		gShader.create("src/shader/GeometryPass.shader", true);
 		rt_info("Loaded geometry pass shader");
 
+		lShader.create("src/shader/LightingPass.shader", false);
+		rt_info("Loaded lighting pass shader");
+
+		GLenum postBufferAttachment = GL_COLOR_ATTACHMENT0;
+		postBuffer.load(rwidth, rheight, 1, &postBufferAttachment, false);
+
+		pShader.create("src/shader/PostProcessing.shader", false);
+
+		compute.load("src/shader/Compute.shader");
+
 		rt_info("Initialized realtime renderer");
 	}
 
 	void render()
 	{
-		glViewport(0, 0, r_width, r_height);
-		gBuffer.bind();
+		glViewport(properties.viewport.pos.x, properties.viewport.pos.y, properties.viewport.size.x, properties.viewport.size.y);
 
-		glClearColor(0, 0, 0, 1);
+		gBuffer.bind();
+		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		gShader.use();
 		int i = 0;
@@ -94,7 +136,7 @@ namespace renderer {
 
 			gShader.setMatrix4f("u_model", obj->getTransform());
 			gShader.setVector4f("albedo", glm::vec4(obj->material._albedo, 1.0f));
-			gShader.setUniform1f("u_rougness", obj->material._roughness);
+			gShader.setUniform1f("u_roughness", obj->material._roughness);
 			gShader.setUniform1f("u_metallic", obj->material._metallic);
 
 			gShader.setUniform1i("useDeffuseMap", obj->usesAlbedoMap());
@@ -132,16 +174,83 @@ namespace renderer {
 
 		gShader.unuse();
 		gBuffer.unbind();
+
+
+		postBuffer.bind();
+		GLCALL(glDisable(GL_CULL_FACE));
+		GLCALL(glDisable(GL_DEPTH_TEST));
+		lShader.use();
+		GLCALL(glClearColor(0, 0, 0, 1));
+		GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 		
+		for (i = 0; i < 4; i++)
+		{
+			GLCALL(glActiveTexture(GL_TEXTURE0 + i));
+			GLCALL(glBindTexture(GL_TEXTURE_2D, gBuffer.getTextureAttachment(i)));
+		}
+
+
+		lShader.setUniform1i("g_Albedo", 0);
+		lShader.setUniform1i("g_Position", 1);
+		lShader.setUniform1i("g_Normal", 2);
+		lShader.setUniform1i("g_Material", 3);
+		lShader.setMatrix4f("u_view", c.view());
+		lShader.setVector3f("camPos", c.position());
+
+		lShader.setUniform1f("u_gamma", properties.gamma);
+		lShader.setUniform1f("u_exposure", properties.exposure);
+		lShader.setUniform1f("u_ambient", properties.ambient);
+
+		// Lights (Hard coded yet)
+		lShader.setUniform1i("amountOfLights", 2);
+		lShader.setVector3f("lights[0].position", { 1,1,1 });
+		lShader.setVector3f("lights[0].color", { 1,1,1 });
+		lShader.setVector3f("lights[1].position", { 0,0,-4 });
+		lShader.setVector3f("lights[1].color", { 1,1,1 });
+
+
+
+		// IBL
+		lShader.setUniform1i("u_irradianceMapSet", false);
+		lShader.setUniform1i("u_specularIBL", false);
+		lShader.setUniform1i("u_cubemap", 10);
+		lShader.setUniform1i("irradianceMap", 11);
+		lShader.setUniform1i("u_brdf;", 12);
+		
+		quad.bind();
+		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
+		quad.unbind();
+		
+		
+		for (i = 0; i < 4; i++)
+		{
+			GLCALL(glActiveTexture(GL_TEXTURE0 + i));
+			GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
+		}
+		
+		lShader.unuse();
+		postBuffer.unbind();
+
+		
+		GLCALL(glBindImageTexture(0, postBuffer.getTextureAttachment(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
+		compute.dispatch(1920, 1080, 1);
+		GLCALL(glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
 
 		fb.bind();
-		glClearColor(0, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glBegin(GL_TRIANGLES);
-		glVertex2f(-0.5, 0);
-		glVertex2f(0.5, -0.5);
-		glVertex2f(0.5, 0.5);
-		glEnd();
+		pShader.use();
+
+		pShader.setUniform1i("frame", 0);
+		pShader.setUniform1f("saturation", properties.saturation);
+		pShader.setVector3f("color_filter", properties.filter);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, postBuffer.getTextureAttachment(0));
+
+		quad.bind();
+		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
+		quad.unbind();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		pShader.unuse();
 		fb.unbind();
 	}
 
@@ -161,6 +270,17 @@ namespace renderer {
 		rt_info("Destroyed geometry pass shader");
 		gBuffer.destroy();
 		rt_info("Destroyed GBuffer");
+
+		lShader.destroy();
+		rt_info("Destroyed lighting pass shader");
+		postBuffer.destroy();
+		rt_info("Destroyed post processing buffer");
+
+		pShader.destroy();
+		rt_info("Destroyed post processing shader");
+
+		compute.destroy();
+
 		rt_info("Disposed renderer");
 	}
 

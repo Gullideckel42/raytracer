@@ -116,5 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="src\shader\GeometryPass.shader" />
+    <None Include="src\shader\LightingPass.shader" />
+    <None Include="src\shader\__LightingPass.shader" />
+    <None Include="src\shader\Compute.shader" />
+    <None Include="src\shader\PostProcessing.shader" />
   </ItemGroup>
 </Project>

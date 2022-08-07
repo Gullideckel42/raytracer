@@ -10,6 +10,9 @@ RT_START
 namespace ui {
 
     int selectedObject = 0;
+    float fontsize = 15.5;
+
+    bool sceneViewFocused = false;
 
     void setDarkTheme() {
         auto& colors = ImGui::GetStyle().Colors;
@@ -77,7 +80,7 @@ namespace ui {
         bool b = false;
         if (ImGui::BeginMenu("File"))
         {
-            if (ImGui::MenuItem("Save (JSON)", "Ctrl + S"))
+            if (ImGui::MenuItem("Save Scene", "Ctrl + S"))
             {
                 // TODO
             }
@@ -94,6 +97,17 @@ namespace ui {
             if (ImGui::MenuItem("Hide UI", "F")) {
 
             }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Render"))
+        {
+            if (ImGui::MenuItem("Render frame", "F12")) {
+                rt_warn("Renderer not implemented yet");
+            }
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("View"))
+        {
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Window"))
@@ -138,7 +152,9 @@ namespace ui {
             ImGui::SameLine();
             ImGui::Checkbox("##Visible", &obj->visible());
 
-            if (ImGui::TreeNode("Rendering"))
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
+
+            if (ImGui::TreeNodeEx("Rendering", flags))
             {
                 ImGui::Checkbox("Visible", &obj->visible());
                 ImGui::Checkbox("Smooth", &obj->smooth());
@@ -155,12 +171,46 @@ namespace ui {
                 }
                 ImGui::TreePop();
             }
-            if (ImGui::TreeNode("Material"))
+            if (ImGui::TreeNodeEx("Material", flags))
             {
+                static ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_TabListPopupButton;
+
+                if (ImGui::BeginTabBar("Material-Tab-Bar", tab_bar_flags))
+                {
+                    if (ImGui::BeginTabItem("Albedo"))
+                    {
+                        ImGui::ColorEdit3("Color", &obj->material._albedo[0]);
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem("Roughness"))
+                    {
+                        ImGui::PushID("properties-roughness");
+                        ImGui::PushItemWidth(ImGui::GetContentRegionMax().x / 6);
+                        ImGui::DragFloat("##Roughness", &obj->material._roughness, 0.01, 0.0, 1.0);
+                        ImGui::PopItemWidth();
+                        ImGui::SameLine();
+                        ImGui::SliderFloat("##r", &obj->material._roughness, 0.0, 1.0);
+                        ImGui::PopID();
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem("Metallic"))
+                    {
+                        ImGui::PushID("properties-metallic");
+                        ImGui::PushItemWidth(ImGui::GetContentRegionMax().x / 6);
+                        ImGui::DragFloat("##Metallic", &obj->material._metallic, 0.01, 0.0, 1.0);
+                        ImGui::PopItemWidth();
+                        ImGui::SameLine();
+                        ImGui::SliderFloat("##m", &obj->material._metallic, 0.0, 1.0);
+                        ImGui::PopID();
+                        ImGui::EndTabItem();
+                    }
+
+                    ImGui::EndTabBar();
+                }
 
                 ImGui::TreePop();
             }
-            if (ImGui::TreeNode("Transform"))
+            if (ImGui::TreeNodeEx("Transform", flags))
             {
 
                 ImGui::TreePop();
@@ -176,15 +226,20 @@ namespace ui {
     void sceneHierarchyPanel()
     {
         using renderer::objects;
-        
+
         ImGui::Begin("Scene Hierarchy");
-        for (int i = 0; i < objects.size(); i++)
-        {
-            std::string objectName = (std::to_string(i) + " \t " + objects[i].getName());
-            if (ImGui::Selectable(objectName.c_str(), selectedObject == i))
+        bool open = ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_SpanFullWidth);
+
+        if (open) {
+           
+            for (int i = 0; i < objects.size(); i++)
             {
-                renderer::c.lookAt() = objects[i].getPosition();
-                selectedObject = i;
+                std::string objectName = (std::to_string(i) + " \t " + objects[i].getName());
+                if (ImGui::Selectable(objectName.c_str(), selectedObject == i))
+                {
+                    renderer::c.lookAt() = objects[i].getPosition();
+                    selectedObject = i;
+                }
             }
         }
         ImGui::End();
@@ -195,8 +250,15 @@ namespace ui {
     {
         using renderer::c;
         ImGui::Begin("Settings");
-
-
+        ImGui::Text("Renderer");
+        ImGui::DragFloat("Gamma", &renderer::properties.gamma, 0.01, 0.0, 10.0);
+        ImGui::DragFloat("Exposure", &renderer::properties.exposure, 0.01, 0.0, 10.0);
+        ImGui::DragFloat("Ambient", &renderer::properties.ambient, 0.01, 0.0, 10.0);
+        ImGui::Text("Postprocessing");
+        ImGui::DragFloat("Saturation", &renderer::properties.saturation, 0.01, 0.0, 1.0);
+        ImGui::DragFloat("Red", &renderer::properties.filter.r, 0.01, 0.0, 1.0);
+        ImGui::DragFloat("Green", &renderer::properties.filter.g, 0.01, 0.0, 1.0);
+        ImGui::DragFloat("Blue", &renderer::properties.filter.b, 0.01, 0.0, 1.0);
         ImGui::End();
     }
     
@@ -211,19 +273,25 @@ namespace ui {
         b |= ImGui::DragFloat("FOV", &c.fov(), 0.1, 20.0f, 300.0f);
         b |= ImGui::DragFloat("Near", &c.near(), 0.1, 0.001f, 10.0f);
         b |= ImGui::DragFloat("Far", &c.far(), 0.1, 10.0f, 3000.0f);
-        b |= ImGui::DragFloat("Width", &c.width());
-        b |= ImGui::DragFloat("Height", &c.height());
-
+        ImGui::Text("Aspect Ratio");
+        float itemwidth = ImGui::GetContentRegionMax().x / 3.0f;
+        ImGui::PushItemWidth(itemwidth);
+        b |= ImGui::DragFloat("##Width", &c.width()); ImGui::SameLine();
+        ImGui::Text("/"); ImGui::SameLine();
+        b |= ImGui::DragFloat("##Height", &c.height());
+        ImGui::PopItemWidth();
         if (b) { c.updateProj(); }
+        ImGui::Text("Viewport");
+        ImGui::DragFloat2("Position", &renderer::properties.viewport.pos[0]);
+        ImGui::DragFloat2("Size", &renderer::properties.viewport.size[0]);
         ImGui::Separator();
         ImGui::Text("Movement");
-        if (ImGui::DragFloat3("Focus", &c.lookAt()[0], 0.01f))
+        if (ImGui::DragFloat3("Focus Point", &c.lookAt()[0], 0.01f))
         {
             renderer::c.update();
-
         }
 
-        if (ImGui::DragFloat2("Rotate", &c.rotation()[0], 0.01f, 0.01f, 3.14159f))
+        if (ImGui::DragFloat2("Rotation", &c.rotation()[0], 0.01f, 0.01f, 3.14159f))
         {
             c.update();
         }
@@ -256,11 +324,12 @@ namespace ui {
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 5,5});
 		ImGui::Begin("Scene View");
+        sceneViewFocused = ImGui::IsWindowFocused() || ImGui::IsWindowHovered();
 
         float w = ImGui::GetContentRegionAvail().x;
         float h = r_height / r_width * w;
 
-        ImGui::Image((ImTextureID)renderer::gBuffer.getTextureAttachment(2), { w, h });
+        ImGui::Image((ImTextureID) fb.getTextureAttachment(0), { w, h });
 
         ImGui::End();
         ImGui::PopStyleVar(2);

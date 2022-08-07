@@ -6,9 +6,23 @@ void h3dgl::ComputeShader::load(const std::string& path) {
 	const char* src_cstr = src.c_str();
 	GLCALL(glShaderSource(m_computeshader, 1, &src_cstr, NULL));
 	GLCALL(glCompileShader(m_computeshader));
+	int result;
+	GLCALL(glGetShaderiv(m_computeshader, GL_COMPILE_STATUS, &result));
+	if (result == GL_FALSE) {
+		int length;
+		GLCALL(glGetShaderiv(m_computeshader, GL_INFO_LOG_LENGTH, &length));
+		char* message = new char[length];
+
+		GLCALL(glGetShaderInfoLog(m_computeshader, length, &length, message));
+		rt_error("Failed to compile compute shader: ", "\n", message);
+		delete[] message;
+		GLCALL(glDeleteShader(m_computeshader));
+		return;
+	}
 	GLCALL(m_program = glCreateProgram());
 	GLCALL(glAttachShader(m_program, m_computeshader));
 	GLCALL(glLinkProgram(m_program));
+	rt_info("Compiled and linked compute shader successful");
 }
 
 std::string h3dgl::ComputeShader::ParseShader(const std::string& path) {
@@ -26,9 +40,10 @@ std::string h3dgl::ComputeShader::ParseShader(const std::string& path) {
 void h3dgl::ComputeShader::destroy() {
 	GLCALL(glDeleteShader(m_computeshader));
 	GLCALL(glDeleteProgram(m_program));
+	rt_info("Destroyed compute shader");
 }
 
-void h3dgl::ComputeShader::run(unsigned int w, unsigned int h, unsigned int d) {
+void h3dgl::ComputeShader::dispatch(unsigned int w, unsigned int h, unsigned int d) {
 	glUseProgram(m_program);
 	glDispatchCompute(w, h, d);
 	glMemoryBarrier(GL_ALL_BARRIER_BITS);

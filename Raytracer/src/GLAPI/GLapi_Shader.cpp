@@ -15,7 +15,7 @@ unsigned int h3dgl::Shader::CompileShader(GLuint type, const std::string& source
         char* message = new char[length];
 
         GLCALL(glGetShaderInfoLog(id, length, &length, message));
-        rt_error("Failed to compile ", ((type == GL_VERTEX_SHADER) ? "vertex" : "fragment"), " shader: (", source, "\n", message);
+        rt_error("Failed to compile ", ((type == GL_VERTEX_SHADER) ? "vertex" : "fragment"), " shader: ", "\n", message);
         delete[] message;
         GLCALL(glDeleteShader(id));
         return 0;

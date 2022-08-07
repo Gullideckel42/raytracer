@@ -1,7 +1,7 @@
 #include "GLapi_Framebuffer.hpp"
 
 
-void h3dgl::Framebuffer::load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer) {
+void h3dgl::Framebuffer::load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer, GLuint format) {
     GLCALL(glGenFramebuffers(1, &buffer));
     GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, buffer));
     m_attachmentCount = attachmentCount;
@@ -13,7 +13,7 @@ void h3dgl::Framebuffer::load(unsigned int width, unsigned int height, unsigned 
     for (int i = 0; i < attachmentCount; i++) {
         GLCALL(glActiveTexture(GL_TEXTURE0));
         GLCALL(glBindTexture(GL_TEXTURE_2D, textureAttachments[i]));
-        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL));
+        GLCALL(glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_FLOAT, NULL));
         GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
         GLCALL(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
         GLCALL(glFramebufferTexture2D(GL_FRAMEBUFFER, attachments[i], GL_TEXTURE_2D, textureAttachments[i], 0));

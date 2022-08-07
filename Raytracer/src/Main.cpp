@@ -66,7 +66,7 @@ void cursor(GLFWwindow* w, double xpos, double ypos)
         mouse5R = true;
     }
 
-    if (Key::Mouse5) {
+    if (Key::Mouse5 && ui::sceneViewFocused) {
         if (firstMouse)
         {
             mouseLastX = xpos;
@@ -103,6 +103,7 @@ void mouse(GLFWwindow* w, int button, int action, int mods)
 
 void scroll(GLFWwindow* window, double xoffset, double yoffset)
 {
+    if (!ui::sceneViewFocused) return;
     renderer::c.radius() -= 0.1*yoffset;
     if (renderer::c.radius() <= 0.1)  renderer::c.radius() = 0.1;
 }
@@ -144,7 +145,7 @@ void mainloop(double frametime)
 
     renderer::render();
 
-    ui::docking();
+    ui::docking(); // needs to be called first
     ui::sceneHierarchyPanel();
     ui::cameraPanel();
     ui::gBufferPanel();

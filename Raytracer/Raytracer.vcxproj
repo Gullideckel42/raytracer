@@ -149,7 +149,11 @@
     <ClCompile Include="src\imgui-docking\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="src\shader\Compute.shader" />
     <None Include="src\shader\GeometryPass.shader" />
+    <None Include="src\shader\PostProcessing.shader" />
+    <None Include="src\shader\__LightingPass.shader" />
+    <None Include="src\shader\LightingPass.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

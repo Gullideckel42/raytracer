@@ -14,7 +14,7 @@ namespace h3dgl {
 		void load(const std::string& src);
 		
 		void destroy();
-		void run(unsigned int w, unsigned int h, unsigned int d);
+		void dispatch(unsigned int w, unsigned int h, unsigned int d);
 	};
 
 }
