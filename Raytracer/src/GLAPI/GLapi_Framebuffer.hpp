@@ -16,7 +16,7 @@ namespace h3dgl {
         bool m_DepthStencilBuffer;
     public:
 
-        void load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer, GLuint format=GL_RGBA16F);
+        void load(unsigned int width, unsigned int height, unsigned int attachmentCount, const GLenum* attachments, bool depthStencilBuffer, GLuint format=GL_RGBA16F, GLuint type=GL_FLOAT);
 
         void destroy();
 
@@ -25,6 +25,8 @@ namespace h3dgl {
         void unbind();
 
         glm::vec2 getSize();
+
+        void saveToPng(const std::string& path, unsigned int target);
 
         unsigned int getAmountOfAttachments();
 

@@ -25,6 +25,8 @@ namespace renderer {
 
 		glm::vec3 filter = {1,1,1 };
 		float saturation = 1.0f;
+
+		bool toneMapping = true;
 	};
 
 	RendererProperties properties;
@@ -204,7 +206,7 @@ namespace renderer {
 		// Lights (Hard coded yet)
 		lShader.setUniform1i("amountOfLights", 2);
 		lShader.setVector3f("lights[0].position", { 1,1,1 });
-		lShader.setVector3f("lights[0].color", { 1,1,1 });
+		lShader.setVector3f("lights[0].color", { 79,19,19 });
 		lShader.setVector3f("lights[1].position", { 0,0,-4 });
 		lShader.setVector3f("lights[1].color", { 1,1,1 });
 
@@ -215,7 +217,9 @@ namespace renderer {
 		lShader.setUniform1i("u_specularIBL", false);
 		lShader.setUniform1i("u_cubemap", 10);
 		lShader.setUniform1i("irradianceMap", 11);
-		lShader.setUniform1i("u_brdf;", 12);
+		lShader.setUniform1i("u_brdf", 12);
+
+		lShader.setUniform1i("toneMapping", properties.toneMapping);
 		
 		quad.bind();
 		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
@@ -232,9 +236,9 @@ namespace renderer {
 		postBuffer.unbind();
 
 		
-		GLCALL(glBindImageTexture(0, postBuffer.getTextureAttachment(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
-		compute.dispatch(1920, 1080, 1);
-		GLCALL(glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
+		//GLCALL(glBindImageTexture(0, postBuffer.getTextureAttachment(0), 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
+		//compute.dispatch(ceil(r_width/4), ceil(r_height/16), 1); // 4x16 Invocations (64 Wavefront/AMD)
+		//GLCALL(glBindImageTexture(0, 0, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA16F));
 
 		fb.bind();
 		pShader.use();

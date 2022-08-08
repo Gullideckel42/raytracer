@@ -26,8 +26,8 @@ public:
 	float& radius() { return r; }
 
 	float& fov() { return m_fov; }
-	float& near() { return m_near; }
-	float& far() { return m_far; }
+	float& nearPlane() { return m_near; }
+	float& farPlane() { return m_far; }
 	float& width() { return m_width; }
 	float& height() { return m_height; }
 

@@ -115,7 +115,7 @@ void init(float width, float height)
    
 
     GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
-    fb.load(r_width, r_height, 1, attachments, false);
+    fb.load(r_width, r_height, 1, attachments, false, GL_RGBA8, GL_UNSIGNED_BYTE);
 
     ui::setDarkTheme();
 

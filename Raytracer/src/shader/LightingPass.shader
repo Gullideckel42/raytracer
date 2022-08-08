@@ -33,6 +33,8 @@ uniform sampler2D u_brdf;
 uniform bool u_irradianceMapSet;
 uniform bool u_specularIBL;
 uniform float mip1 = 0.0f;
+uniform bool toneMapping = true;
+
 #define MAX_LIGHTS 100
 
 struct PointLight {
@@ -156,8 +158,12 @@ void main() {
     vec3 clr = ambient + Lo;
 
     //clr = clr / (clr + vec3(1.0));
-    clr = vec3(1.0) - exp(-clr * u_exposure);
-    clr = pow(clr, vec3(1.0 / u_gamma));
+    if (toneMapping)
+    {
+        clr = vec3(1.0) - exp(-clr * u_exposure);
+        clr = pow(clr, vec3(1.0 / u_gamma));
+    }
+
 
     color = vec4(clr, 1.0f);
 }

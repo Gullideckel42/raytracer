@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../Core.hpp"
+#include "../Util/FileDialog.hpp"
 #include "../imgui-docking/imgui.h"
 #include "../imgui-docking/imgui_impl_glfw.h"
 #include "../imgui-docking/imgui_impl_opengl3.h"
@@ -83,6 +84,19 @@ namespace ui {
             if (ImGui::MenuItem("Save Scene", "Ctrl + S"))
             {
                 // TODO
+            }
+            if (ImGui::MenuItem("Save Frame", "Ctrl + D"))
+            {
+                std::string path = util::filedialog::SaveFile(w.handle(), "PNG (, *.png)\0*.png;\0");
+                if (path != std::string("___failed___"))
+                {
+                    fb.saveToPng(path, 0);
+                    rt_info("Saved frame to ", path);
+                }
+                else
+                {
+                    rt_warn("File dialog canceled");
+                }
             }
             ImGui::EndMenu();
         }
@@ -259,6 +273,7 @@ namespace ui {
         ImGui::DragFloat("Red", &renderer::properties.filter.r, 0.01, 0.0, 1.0);
         ImGui::DragFloat("Green", &renderer::properties.filter.g, 0.01, 0.0, 1.0);
         ImGui::DragFloat("Blue", &renderer::properties.filter.b, 0.01, 0.0, 1.0);
+        ImGui::Checkbox("Tone mapping", &renderer::properties.toneMapping);
         ImGui::End();
     }
     
@@ -271,8 +286,8 @@ namespace ui {
 
         bool b = false;
         b |= ImGui::DragFloat("FOV", &c.fov(), 0.1, 20.0f, 300.0f);
-        b |= ImGui::DragFloat("Near", &c.near(), 0.1, 0.001f, 10.0f);
-        b |= ImGui::DragFloat("Far", &c.far(), 0.1, 10.0f, 3000.0f);
+        b |= ImGui::DragFloat("Near", &c.nearPlane(), 0.1, 0.001f, 10.0f);
+        b |= ImGui::DragFloat("Far", &c.farPlane(), 0.1, 10.0f, 3000.0f);
         ImGui::Text("Aspect Ratio");
         float itemwidth = ImGui::GetContentRegionMax().x / 3.0f;
         ImGui::PushItemWidth(itemwidth);

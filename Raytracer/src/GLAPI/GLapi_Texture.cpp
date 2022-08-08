@@ -2,9 +2,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "ThirdParty/stb/stb_image.h"
 
+
 void h3dgl::Texture::load(const std::string& path) {
     if (m_loaded) return;
 	stbi_set_flip_vertically_on_load(true);
+    
 	auto texBuffer = stbi_load(path.c_str(), &m_width, &m_height, &m_bitsPerPixel, 4);
     std::cout << "Path: " << path.c_str() <<  ",Width: " << m_width << ", Height: " << m_height << "| bpp: " 
         << m_bitsPerPixel << std::endl;

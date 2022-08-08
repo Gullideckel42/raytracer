@@ -72,6 +72,7 @@
     <ClInclude Include="src\Renderer\RT_Object.hpp" />
     <ClInclude Include="src\Renderer\RT_Material.hpp" />
     <ClInclude Include="src\Renderer\RT_Camera.hpp" />
+    <ClInclude Include="src\Util\FileDialog.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Log\RT_Log.cpp">
@@ -117,7 +118,6 @@
   <ItemGroup>
     <None Include="src\shader\GeometryPass.shader" />
     <None Include="src\shader\LightingPass.shader" />
-    <None Include="src\shader\__LightingPass.shader" />
     <None Include="src\shader\Compute.shader" />
     <None Include="src\shader\PostProcessing.shader" />
   </ItemGroup>

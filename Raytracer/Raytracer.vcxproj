@@ -124,6 +124,7 @@
     <ClInclude Include="src\imgui-docking\imstb_rectpack.h" />
     <ClInclude Include="src\imgui-docking\imstb_textedit.h" />
     <ClInclude Include="src\imgui-docking\imstb_truetype.h" />
+    <ClInclude Include="src\Util\FileDialog.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GLAPI\GLapi_ComputeShader.cpp" />
@@ -152,7 +153,6 @@
     <None Include="src\shader\Compute.shader" />
     <None Include="src\shader\GeometryPass.shader" />
     <None Include="src\shader\PostProcessing.shader" />
-    <None Include="src\shader\__LightingPass.shader" />
     <None Include="src\shader\LightingPass.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

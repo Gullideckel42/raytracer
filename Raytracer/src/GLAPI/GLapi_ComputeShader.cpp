@@ -43,9 +43,9 @@ void h3dgl::ComputeShader::destroy() {
 	rt_info("Destroyed compute shader");
 }
 
-void h3dgl::ComputeShader::dispatch(unsigned int w, unsigned int h, unsigned int d) {
-	glUseProgram(m_program);
-	glDispatchCompute(w, h, d);
-	glMemoryBarrier(GL_ALL_BARRIER_BITS);
-	glUseProgram(0);
+void h3dgl::ComputeShader::dispatch(unsigned int w, unsigned int h, unsigned int d, GLuint barrier) {
+	GLCALL(glUseProgram(m_program));
+	GLCALL(glDispatchCompute(w, h, d));
+	GLCALL(glMemoryBarrier(barrier));
+	GLCALL(glUseProgram(0));
 }
