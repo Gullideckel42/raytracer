@@ -104,30 +104,33 @@ void mouse(GLFWwindow* w, int button, int action, int mods)
 void scroll(GLFWwindow* window, double xoffset, double yoffset)
 {
     if (!ui::sceneViewFocused) return;
-    renderer::c.radius() -= 0.1*yoffset;
+    renderer::c.radius() -= renderer::c.scrollSensitivity() * yoffset;
     if (renderer::c.radius() <= 0.1)  renderer::c.radius() = 0.1;
 }
 
-void init(float width, float height)
+void init(RT_ ui::WindowDimensions windowSize, RT_ ui::WindowDimensions renderTargetSize)
 {
-    rt_info("Begin initialization!");
-    CORE_ASSERT(w.create("Raytracer - OpenGl/C++ GLFW", { width, height }, key, cursor, mouse, scroll));
-   
+    r_width = renderTargetSize.width;
+    r_height = renderTargetSize.height;
+
+    rt_info("Core", "Begin initialization");
+    CORE_ASSERT(w.create("Raytracer - OpenGl/C++ GLFW", { windowSize.width, windowSize.height }, key, cursor, mouse, scroll));
 
     GLenum attachments[] = { GL_COLOR_ATTACHMENT0 };
-    fb.load(r_width, r_height, 1, attachments, false, GL_RGBA8, GL_UNSIGNED_BYTE);
+    fb.load(renderTargetSize.width, renderTargetSize.height, 1, attachments, false, GL_RGBA8, GL_UNSIGNED_BYTE);
 
+    ui::init();
     ui::setDarkTheme();
+    
+    renderer::init(renderTargetSize.width, renderTargetSize.height);
 
-    renderer::init(r_width, r_height);
-
-    rt_info("Started mainloop");
+    rt_info("Core", "Started mainloop");
     w.startMainLoop(mainloop);
 }
 
 void update(double frametime)
 {
-
+    renderer::lastFrameMS = frametime;
     if (Key::L)
     {
         
@@ -152,14 +155,17 @@ void mainloop(double frametime)
     ui::propertiesPanel();
     ui::sceneView();
     ui::settingsPanel();
-
+    ui::statisticsPanel();
 }
 
 void dispose()
 {
     renderer::dispose();
+    rt_info("Core", "Disposed realtime renderer");
+    ui::dispose();
     fb.destroy();
     w.destroy();
+    rt_info("Core", "Disposed user interface and window");
 }
 
 RT_END
@@ -171,9 +177,25 @@ RT_END
  */
 int main(int argc, char** argv)
 {
-    
+    int w = 1920;
+    int h = 1080;
 
-    rt::init(1600, 900);
+    if (argc == 3)
+    {
+        try
+        {
+            w = std::stoi(argv[1]);
+            h = std::stoi(argv[2]);
+        }
+        catch (std::invalid_argument e) { rt_error("Initializer", "Entered invalid input data. It will revert to the default values (1920x1080)"); }
+        catch (std::overflow_error e) { rt_error("Initializer", "Input data caused an overflow. It will revert to the default values (1920x1080)"); }
+    }
+    else if (argc == 1)
+    {
+        rt_warn("Initializer", "No command line input given. Renderer will boot up using default values");
+    }
+
+    rt::init({ 1600, 900 }, {(float) w, (float) h});
     rt::dispose();
 
 

@@ -6,3 +6,4 @@ Raytracer/assets
 bin/
 bin-int/
 Raytracer/Raytracer.vcxproj.user
+renders/

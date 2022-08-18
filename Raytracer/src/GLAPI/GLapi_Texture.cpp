@@ -8,8 +8,8 @@ void h3dgl::Texture::load(const std::string& path) {
 	stbi_set_flip_vertically_on_load(true);
     
 	auto texBuffer = stbi_load(path.c_str(), &m_width, &m_height, &m_bitsPerPixel, 4);
-    std::cout << "Path: " << path.c_str() <<  ",Width: " << m_width << ", Height: " << m_height << "| bpp: " 
-        << m_bitsPerPixel << std::endl;
+    rt_info("GL", "Loaded texture: " , path.c_str() ,  ",Width: " , m_width , ", Height: " , m_height , "| bpp: " 
+        , m_bitsPerPixel);
 	GLCALL(glGenTextures(1, &texture));
     GLCALL(glActiveTexture(GL_TEXTURE0));
     GLCALL(glBindTexture(GL_TEXTURE_2D, texture));
@@ -36,7 +36,6 @@ void h3dgl::Texture::destroy() {
     m_height = 0;
     m_bitsPerPixel = 0;
     m_loaded = false;
-    std::cout << "Deleted texture: " << m_path << std::endl;
 }
 
 bool h3dgl::Texture::isLoaded() {
@@ -84,7 +83,7 @@ void h3dgl::Cubemap::load(
             stbi_image_free(texBuffer);
         }
         else {
-           std::cout << "Texture could not be loaded: Cubemap" << std::endl;
+            rt_error("GL", "Failed loading cubemap");
         }
     }
     

@@ -14,19 +14,23 @@ namespace renderer {
 		glm::vec2 size;
 	};
 
-	
+	uint32_t totalFrames = 0;
+	unsigned int drawCalls = 0;
+	double lastFrameMS = 0.0;
+	bool active = true;
 
 	struct RendererProperties
 	{
 		Viewport viewport = {};
 		float gamma = 2.0f;
 		float exposure = 3.2f;
-		float ambient = 0.01f;
+		float ambient = 0.001f;
 
 		glm::vec3 filter = {1,1,1 };
 		float saturation = 1.0f;
 
 		bool toneMapping = true;
+		bool gammaCorrection = true;
 	};
 
 	RendererProperties properties;
@@ -42,14 +46,14 @@ namespace renderer {
 	RT_ Camera c;
 	GL_ Mesh cube, quad;
 
-	std::vector <GL_ Mesh> meshes;
+	std::vector<GL_ Mesh> meshes;
 	std::vector<RT_ Object> objects;
+	std::vector<RT_ PointLight> lights;
 
 	GL_ ComputeShader compute;
 
 	void init(float rwidth, float rheight)
 	{
-
 
 		properties.viewport = { {0,0}, {rwidth, rheight} };
 
@@ -89,34 +93,37 @@ namespace renderer {
 		objects.at(2).getPosition() = { -2, 1, -3 };
 		objects.at(2).updateTransform();
 
+		lights.push_back(PointLight{ {2,2,2}, {1,1,1}, 1.0f });
+		lights.push_back(PointLight{ {-2,2,-2}, {0.2,1,0.2}, 2.0f });
 
 		// Camera
 		c.create(90.0, rwidth, rheight, 0.1, 100.0);
-		rt_info("Created perspective camera (FOV: ", 90.0f, " Degree)");
+		rt_info("Renderer", "Created perspective camera (FOV: ", 90.0f, " Degree)");
 
-		GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-		gBuffer.load(rwidth, rheight, 4, attachments, true);
-		rt_info("Loaded GBuffer");
 
 		gShader.create("src/shader/GeometryPass.shader", true);
-		rt_info("Loaded geometry pass shader");
-
 		lShader.create("src/shader/LightingPass.shader", false);
-		rt_info("Loaded lighting pass shader");
+		pShader.create("src/shader/PostProcessing.shader", false);
+		rt_info("Renderer", "Loaded shaders (3 Shaders)");
 
 		GLenum postBufferAttachment = GL_COLOR_ATTACHMENT0;
 		postBuffer.load(rwidth, rheight, 1, &postBufferAttachment, false);
-
-		pShader.create("src/shader/PostProcessing.shader", false);
+		GLenum attachments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
+		gBuffer.load(rwidth, rheight, 4, attachments, true);
+		rt_info("Renderer", "Allocated framebuffers (2 Buffers, 5 Attachments + Depth)");
 
 		compute.load("src/shader/Compute.shader");
-
-		rt_info("Initialized realtime renderer");
+		rt_info("Renderer", "Initialized realtime renderer");
 	}
 
 	void render()
 	{
+		if (!active) return;
+		drawCalls = 0;
+
 		glViewport(properties.viewport.pos.x, properties.viewport.pos.y, properties.viewport.size.x, properties.viewport.size.y);
+
+
 
 		gBuffer.bind();
 		glClearColor(0, 0, 0, 0);
@@ -168,6 +175,7 @@ namespace renderer {
 				GLCALL(glEnable(GL_DEPTH_TEST));
 			}
 			GLCALL(glDrawElements(GL_TRIANGLES, obj->IndexCount(), GL_UNSIGNED_INT, NULL));
+			drawCalls++;
 			if (obj->Wireframe()) { GLCALL(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)); }
 			obj->unbind();
 
@@ -204,11 +212,14 @@ namespace renderer {
 		lShader.setUniform1f("u_ambient", properties.ambient);
 
 		// Lights (Hard coded yet)
-		lShader.setUniform1i("amountOfLights", 2);
-		lShader.setVector3f("lights[0].position", { 1,1,1 });
-		lShader.setVector3f("lights[0].color", { 79,19,19 });
-		lShader.setVector3f("lights[1].position", { 0,0,-4 });
-		lShader.setVector3f("lights[1].color", { 1,1,1 });
+		lShader.setUniform1i("amountOfLights", lights.size());
+
+		for (int i = 0; i < lights.size(); i++)
+		{
+			std::string uniformName = "lights[" + std::to_string(i) + "].";
+			lShader.setVector3f(uniformName + "position", lights[i].position);
+			lShader.setVector3f(uniformName + "color", lights[i].color * lights[i].brightness);
+		}
 
 
 
@@ -220,9 +231,11 @@ namespace renderer {
 		lShader.setUniform1i("u_brdf", 12);
 
 		lShader.setUniform1i("toneMapping", properties.toneMapping);
-		
+		lShader.setUniform1i("gammaCorrection", properties.gammaCorrection);
+
 		quad.bind();
 		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
+		drawCalls++;
 		quad.unbind();
 		
 		
@@ -251,41 +264,69 @@ namespace renderer {
 
 		quad.bind();
 		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
+		drawCalls++;
 		quad.unbind();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		pShader.unuse();
 		fb.unbind();
+		totalFrames++;
 	}
 
 	void dispose()
 	{
 
+		for (int i = 0; i < objects.size(); i++)
+		{
+			if (objects[i].material.albedo != nullptr)
+			{
+				objects[i].material.albedo->destroy();
+				delete objects[i].material.albedo;
+				objects[i].material.albedo = nullptr;
+			}	
+			if (objects[i].material.normal != nullptr)
+			{
+				objects[i].material.normal->destroy();
+				delete objects[i].material.normal;
+				objects[i].material.normal = nullptr;
+			}
+			if (objects[i].material.roughness != nullptr)
+			{
+				objects[i].material.roughness->destroy();
+				delete objects[i].material.roughness;
+				objects[i].material.roughness = nullptr;
+			}
+			if (objects[i].material.metallic != nullptr)
+			{
+				objects[i].material.metallic->destroy();
+				delete objects[i].material.metallic;
+				objects[i].material.metallic = nullptr;
+			}
+			if (objects[i].material.ambientOcclusion != nullptr)
+			{
+				objects[i].material.ambientOcclusion->destroy();
+				delete objects[i].material.ambientOcclusion;
+				objects[i].material.ambientOcclusion = nullptr;
+			}
+		}
+		
 		for (int i = 0; i < meshes.size(); i++)
 		{
 			meshes[i].destroy();
-			rt_info("Destroyed mesh ", i);
 		}
 		
 		cube.destroy();
 		quad.destroy();
 
 		gShader.destroy();
-		rt_info("Destroyed geometry pass shader");
-		gBuffer.destroy();
-		rt_info("Destroyed GBuffer");
-
 		lShader.destroy();
-		rt_info("Destroyed lighting pass shader");
-		postBuffer.destroy();
-		rt_info("Destroyed post processing buffer");
-
 		pShader.destroy();
-		rt_info("Destroyed post processing shader");
-
 		compute.destroy();
-
-		rt_info("Disposed renderer");
+		rt_info("Renderer", "Destroyed shaders");
+		gBuffer.destroy();
+		postBuffer.destroy();
+		rt_info("Renderer", "Destroyed buffers");
+	
 	}
 
 }

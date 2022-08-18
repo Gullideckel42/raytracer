@@ -34,6 +34,7 @@ uniform bool u_irradianceMapSet;
 uniform bool u_specularIBL;
 uniform float mip1 = 0.0f;
 uniform bool toneMapping = true;
+uniform bool gammaCorrection = true;
 
 #define MAX_LIGHTS 100
 
@@ -159,11 +160,10 @@ void main() {
 
     //clr = clr / (clr + vec3(1.0));
     if (toneMapping)
-    {
         clr = vec3(1.0) - exp(-clr * u_exposure);
-        clr = pow(clr, vec3(1.0 / u_gamma));
-    }
 
+    if(gammaCorrection)
+        clr = pow(clr, vec3(1.0 / u_gamma));
 
     color = vec4(clr, 1.0f);
 }

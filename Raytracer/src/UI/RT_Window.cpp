@@ -13,7 +13,7 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 
 	if (!glfwInit())
 	{
-		rt_fatal("GLFW Initialization failed");
+		rt_fatal("Core", "GLFW Initialization failed");
 		return false;
 	}
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -23,7 +23,7 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 
 	if (!m_window)
 	{
-		rt_fatal("Failed to create GLFW window");
+		rt_fatal("Core", "Failed to create GLFW window");
 		glfwTerminate();
 		return false;
 	}
@@ -32,12 +32,12 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 
 	if (glewInit() != GLEW_OK)
 	{
-		rt_fatal("GLEW Initialization failed");
+		rt_fatal("Core", "GLEW Initialization failed");
 		glfwTerminate();
 		return false;
 	}
 
-	rt_info("OpenGL API Version: ", glGetString(GL_VERSION));
+	rt_info("Core", "OpenGL API Version: ", glGetString(GL_VERSION));
 
 	setKeyCallback(keyCallback);
 	setCursorCallback(cursorCallback);
@@ -71,7 +71,7 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 
 
 	m_allocated = true;
-	rt_info("Created window(", m_size.width, "x", m_size.height, ") successful");
+	rt_info("Core", "Created window(", m_size.width, "x", m_size.height, ") successful");
 	return true;
 }
 
@@ -86,7 +86,7 @@ void RT_ ui::Window::destroy()
 	m_window = nullptr;
 	glfwTerminate();
 	m_allocated = false;
-	rt_info("Destroyed window(", m_size.width, "x", m_size.height, ") successful")
+	rt_info("Core", "Destroyed window(", m_size.width, "x", m_size.height, ") successful")
 }
 
 

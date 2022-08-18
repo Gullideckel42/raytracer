@@ -31,6 +31,8 @@ public:
 	float& width() { return m_width; }
 	float& height() { return m_height; }
 
+	float& scrollSensitivity() { return m_scrollSensitivity; }
+
 	void updateProj();
 
 private:
@@ -53,6 +55,8 @@ private:
 	glm::mat4 m_projection;
 	glm::mat4 m_viewProj;
 	glm::vec3 m_position;
+
+	float m_scrollSensitivity = 0.5;
 };
 
 

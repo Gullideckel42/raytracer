@@ -26,7 +26,7 @@ namespace h3dgl {
 
         glm::vec2 getSize();
 
-        void saveToPng(const std::string& path, unsigned int target);
+        bool saveToPng(const std::string& path, unsigned int target);
 
         unsigned int getAmountOfAttachments();
 

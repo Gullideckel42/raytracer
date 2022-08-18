@@ -4,6 +4,13 @@
 RT_START
 
 
+struct PointLight
+{
+	glm::vec3 position = glm::vec3(0, 0, 0);
+	glm::vec3 color = glm::vec3(1,1,1);
+	float brightness = 0.0f;
+};
+
 class Object
 {
 public:
@@ -14,26 +21,26 @@ public:
 
 	void unbind();
 
-	unsigned int IndexCount() const { return m_mesh->indexCount(); }
-	unsigned int VertexCount() const { return m_mesh->vertexCount(); }
+	inline unsigned int IndexCount() const { return m_mesh->indexCount(); }
+	inline unsigned int VertexCount() const { return m_mesh->vertexCount(); }
 
-	glm::mat4& getTransform() { return m_transform; }
-	glm::vec3& getPosition() { return m_position; }
-	glm::vec3& getRotation() { return m_rotation; }
-	glm::vec3& getScale() { return m_scale; }
+	inline glm::mat4& getTransform() { return m_transform; }
+	inline glm::vec3& getPosition() { return m_position; }
+	inline glm::vec3& getRotation() { return m_rotation; }
+	inline glm::vec3& getScale() { return m_scale; }
 
-	bool& usesNormalMap() { return m_useNormalMap; }
-	bool& usesAlbedoMap() { return m_useAlbedoMap; }
-	bool& usesRoughnessMap() { return m_useRoughnessMap; }
-	bool& usesMetallicMap() { return m_useMetallicMap; }
-	bool& usesAmbientOcclusionMap() { return m_useAmbientOcclusion; }
+	inline bool& usesNormalMap() { return m_useNormalMap; }
+	inline bool& usesAlbedoMap() { return m_useAlbedoMap; }
+	inline bool& usesRoughnessMap() { return m_useRoughnessMap; }
+	inline bool& usesMetallicMap() { return m_useMetallicMap; }
+	inline bool& usesAmbientOcclusionMap() { return m_useAmbientOcclusion; }
 
 
-	bool& Wireframe() { return m_wireframe; }
-	bool& backfaceCulling() { return m_backfaceCulling; }
-	bool& cullMode() { return m_backfaceCullingmode; }
-	bool& depthTesting() { return m_depthTesting; }
-	bool& smooth() { return m_smoothShaded; }
+	inline bool& Wireframe() { return m_wireframe; }
+	inline bool& backfaceCulling() { return m_backfaceCulling; }
+	inline bool& cullMode() { return m_backfaceCullingmode; }
+	inline bool& depthTesting() { return m_depthTesting; }
+	inline bool& smooth() { return m_smoothShaded; }
 
 	void setName(const std::string& name) { m_name = name; }
 	std::string getName() const { return m_name; }

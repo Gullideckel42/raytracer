@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="GLAPI">
+      <UniqueIdentifier>{D2972E0D-3EAC-56BE-072E-FA1D730153EF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLAPI\ThirdParty">
+      <UniqueIdentifier>{4CA9C1A7-38A2-E0F9-61D4-C57E4D2CC005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GLAPI\ThirdParty\stb">
+      <UniqueIdentifier>{A42DE997-90BC-7261-39DB-865C25498307}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Log">
       <UniqueIdentifier>{E704880B-530E-887C-DC89-9E7C4892937C}</UniqueIdentifier>
     </Filter>
@@ -10,14 +19,71 @@
     <Filter Include="UI">
       <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{23A78D7C-0FDE-8E0D-B8CA-7410A4E00A0F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="imgui-docking">
       <UniqueIdentifier>{6C503BBE-D810-B7F4-A14B-00720DCBFBD0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core.hpp" />
+    <ClInclude Include="src\GLAPI\GLapi.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_ComputeShader.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_CubeDepthMap.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_EquirectangularMap.h">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_Framebuffer.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_GLerror.h">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_IndexBuffer.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_Mesh.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_Shader.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_Texture.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_Vertex.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\GLapi_VertexBuffer.hpp">
+      <Filter>GLAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\ThirdParty\OBJ_Loader.h">
+      <Filter>GLAPI\ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\ThirdParty\stb\stb_image.h">
+      <Filter>GLAPI\ThirdParty\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GLAPI\ThirdParty\stb\stb_image_write.h">
+      <Filter>GLAPI\ThirdParty\stb</Filter>
+    </ClInclude>
     <ClInclude Include="src\Log\RT_Log.hpp">
       <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RT_Camera.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RT_Material.hpp">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Renderer\RT_Object.hpp">
+      <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\RT_Renderer.hpp">
       <Filter>Renderer</Filter>
@@ -27,6 +93,21 @@
     </ClInclude>
     <ClInclude Include="src\UI\RT_Window.hpp">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Util\FileDialog.hpp">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\ImCurveEdit.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\ImGradient.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\ImGuizmo.h">
+      <Filter>imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="src\imgui-docking\ImSequencer.h">
+      <Filter>imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="src\imgui-docking\imconfig.h">
       <Filter>imgui-docking</Filter>
@@ -55,32 +136,56 @@
     <ClInclude Include="src\imgui-docking\imstb_truetype.h">
       <Filter>imgui-docking</Filter>
     </ClInclude>
-    <ClInclude Include="src\GLAPI\ThirdParty\stb\stb_image.h" />
-    <ClInclude Include="src\GLAPI\ThirdParty\OBJ_Loader.h" />
-    <ClInclude Include="src\GLAPI\GLapi.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_ComputeShader.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_CubeDepthMap.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_EquirectangularMap.h" />
-    <ClInclude Include="src\GLAPI\GLapi_Framebuffer.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_GLerror.h" />
-    <ClInclude Include="src\GLAPI\GLapi_IndexBuffer.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_Mesh.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_Shader.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_Texture.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_Vertex.hpp" />
-    <ClInclude Include="src\GLAPI\GLapi_VertexBuffer.hpp" />
-    <ClInclude Include="src\Renderer\RT_Object.hpp" />
-    <ClInclude Include="src\Renderer\RT_Material.hpp" />
-    <ClInclude Include="src\Renderer\RT_Camera.hpp" />
-    <ClInclude Include="src\Util\FileDialog.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Log\RT_Log.cpp">
-      <Filter>Log</Filter>
+    <ClCompile Include="src\GLAPI\GLapi_ComputeShader.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_CubeDepthMap.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_EquirectangularMap.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_Framebuffer.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_IndexBuffer.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_Mesh.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_Shader.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_Texture.cpp">
+      <Filter>GLAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GLAPI\GLapi_VertexBuffer.cpp">
+      <Filter>GLAPI</Filter>
     </ClCompile>
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Renderer\RT_Camera.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Renderer\RT_Object.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\UI\RT_Window.cpp">
       <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\ImCurveEdit.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\ImGradient.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\ImGuizmo.cpp">
+      <Filter>imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="src\imgui-docking\ImSequencer.cpp">
+      <Filter>imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="src\imgui-docking\imgui.cpp">
       <Filter>imgui-docking</Filter>
@@ -103,22 +208,5 @@
     <ClCompile Include="src\imgui-docking\imgui_widgets.cpp">
       <Filter>imgui-docking</Filter>
     </ClCompile>
-    <ClCompile Include="src\GLAPI\GLapi_ComputeShader.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_CubeDepthMap.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_EquirectangularMap.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_Framebuffer.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_IndexBuffer.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_Mesh.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_Shader.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_Texture.cpp" />
-    <ClCompile Include="src\GLAPI\GLapi_VertexBuffer.cpp" />
-    <ClCompile Include="src\Renderer\RT_Object.cpp" />
-    <ClCompile Include="src\Renderer\RT_Camera.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="src\shader\GeometryPass.shader" />
-    <None Include="src\shader\LightingPass.shader" />
-    <None Include="src\shader\Compute.shader" />
-    <None Include="src\shader\PostProcessing.shader" />
   </ItemGroup>
 </Project>

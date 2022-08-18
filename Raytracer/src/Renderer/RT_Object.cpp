@@ -12,7 +12,7 @@ bool RT_ Object::create(std::string name, GL_ Mesh* mesh, RT_ Material mat)
     m_rotation = glm::vec3(0.0f);
 
 
-    rt_info("Created new object: ", name);
+    rt_info("Renderer", "Created new object: ", name);
 
     return true;
 }

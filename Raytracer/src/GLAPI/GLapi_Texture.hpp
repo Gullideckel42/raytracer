@@ -21,6 +21,8 @@ namespace h3dgl {
 
 		bool isLoaded();
 
+		inline std::string getPath() { return m_path; }
+
 		virtual void destroy();
 
 		virtual void bind(unsigned int slot) const;

@@ -4,18 +4,17 @@ void h3dgl::Mesh::loadFromFile(std::string path, unsigned int meshIndex) {
 	// Uses OBJ_Loader.h
 	objl::Loader loader;
 	if (!loader.LoadFile(path)) {
-		rt_error("Could not load mesh (", path, ")");
+		rt_error("Mesh loader", "Failed loading mesh (", path, ")");
 		return;
 	}
 	
 	std::vector <objl::Mesh> meshes = loader.LoadedMeshes;
-	rt_info(path, ": ", meshes.size(), " Meshes found");
 	std::vector <uint32_t> l_indices;
 
 	std::vector<h3dgl::Vertex> l_vertices;
 	//int z = meshes.size() == 2 ? 1 : 0;
 	if (!(meshIndex < meshes.size())) {
-		rt_error(path, " has only ", meshes.size(), " meshes");
+		rt_error("Texture loader", path, " has only ", meshes.size(), " meshes");
 		return;
 	}
 
@@ -37,7 +36,7 @@ void h3dgl::Mesh::loadFromFile(std::string path, unsigned int meshIndex) {
 	}
 	
 	load(l_vertices.data(), l_vertices.size(), l_indices.data(), l_indices.size());
-	rt_info("Loaded mesh (", vertexCount(), " vertices, ", indexCount(), " indices");
+	rt_info("Mesh loader", "Loaded mesh (", vertexCount(), " vertices, ", indexCount(), " indices");
 }
 
 void h3dgl::Mesh::load(const h3dgl::Vertex* vertexData, unsigned int vertexCount, const uint32_t* indexData, unsigned int indexCount) {

@@ -57,15 +57,14 @@ glm::vec2 h3dgl::Framebuffer::getSize() {
     return glm::vec2(m_width, m_height);
 }
 
-void h3dgl::Framebuffer::saveToPng(const std::string& path, unsigned int target)
+bool h3dgl::Framebuffer::saveToPng(const std::string& path, unsigned int target)
 {
 
     constexpr unsigned int numChannels = 4;
     void* data = malloc(numChannels * m_width * m_height);
     if (!data)
     { 
-        rt_error("Failed saving frame ", path);
-        return;
+        return false;
     }
     memset(data, 0, numChannels * m_width * m_height);
     GLCALL(glBindTexture(GL_TEXTURE_2D, textureAttachments[target]));
@@ -74,6 +73,7 @@ void h3dgl::Framebuffer::saveToPng(const std::string& path, unsigned int target)
     stbi_flip_vertically_on_write(false);
     stbi_write_png(path.c_str(), m_width, m_height, numChannels, data, m_width * numChannels);
     free(data);
+    return true;
 }
 
 unsigned int h3dgl::Framebuffer::getAmountOfAttachments() {

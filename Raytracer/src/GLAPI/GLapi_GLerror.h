@@ -1,3 +1,4 @@
+#pragma once
 #ifndef H3DGLAPI_GLERROR
 
     #define H3DGLAPI_GLERROR
@@ -55,7 +56,7 @@
 
         while (GLenum error = glGetError()) {
 
-            rt_error("{OpenGL Error 0x", std::hex, error, std::dec, "}: ", blue, function, reset, " at ", file, ":", yellow, line, reset,
+            rt_error("GL", "{OpenGL Error 0x", std::hex, error, std::dec, "}: ", blue, function, reset, " at ", file, ":", yellow, line, reset,
                 " -- ", red, GetGLErrorString(error), reset);
 
             //std::cout << red << "[OpenGL Error]" << reset << " (Code: 0x" << std::hex << error << std::dec << "; " << error << ") : "
