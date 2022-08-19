@@ -7,3 +7,5 @@ bin/
 bin-int/
 Raytracer/Raytracer.vcxproj.user
 renders/
+todo.md
+rcs/

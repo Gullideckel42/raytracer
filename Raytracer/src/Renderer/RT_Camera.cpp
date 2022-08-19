@@ -19,8 +19,6 @@ void RT_ Camera::create(float fov, float width, float height, float zNear, float
 
 void RT_ Camera::update()
 {
-	m_up = { 0,-1,0 };
-
 	
 	m_position = m_lookAt;
 	m_position.x += r * abs(sin(m_rotation.x)) * cos(m_rotation.y);
@@ -47,6 +45,6 @@ void RT_ Camera::rotate(float xRel, float yRel) {
 void RT_ Camera::updateProj()
 {
 
-	m_projection = glm::perspective(glm::radians(m_fov) / 2.0f, m_width / m_height, m_near, m_far);
+	m_projection = glm::perspective((float) glm::radians(m_fov) / 2.0f, m_width / m_height, m_near, m_far);
 	m_viewProj = m_projection * m_view;
 }

@@ -31,6 +31,8 @@ public:
 	float& width() { return m_width; }
 	float& height() { return m_height; }
 
+	inline glm::vec3& up() { return m_up; }
+
 	float& scrollSensitivity() { return m_scrollSensitivity; }
 
 	void updateProj();

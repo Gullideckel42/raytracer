@@ -38,7 +38,7 @@ bool RT_ ui::Window::create(std::string title, RT_ ui::WindowDimensions dimensio
 	}
 
 	rt_info("Core", "OpenGL API Version: ", glGetString(GL_VERSION));
-
+	rt_info("Core", "Graphics Processor: ", glGetString(GL_RENDERER));
 	setKeyCallback(keyCallback);
 	setCursorCallback(cursorCallback);
 	glfwSetMouseButtonCallback(m_window, mouseCallback);
@@ -127,7 +127,6 @@ void RT_ ui::Window::startMainLoop(std::function<void(double)> f)
 #endif
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
-		std::this_thread::sleep_for(std::chrono::milliseconds((unsigned int)2));
 		auto end = std::chrono::high_resolution_clock::now();
 		long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		frametime = (double)elapsed;

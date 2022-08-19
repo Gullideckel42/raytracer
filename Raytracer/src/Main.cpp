@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <chrono>
 
 #include "UI/RT_Window.hpp"
 #include "GLAPI/GLapi.hpp"
@@ -80,7 +80,7 @@ void cursor(GLFWwindow* w, double xpos, double ypos)
 
         xoffset *= 0.32;
         yoffset *= 0.32;
-        renderer::c.rotate(yoffset, -xoffset);
+        renderer::c.rotate(yoffset, xoffset);
     }
 }
 
@@ -110,6 +110,7 @@ void scroll(GLFWwindow* window, double xoffset, double yoffset)
 
 void init(RT_ ui::WindowDimensions windowSize, RT_ ui::WindowDimensions renderTargetSize)
 {
+    auto start = std::chrono::high_resolution_clock::now();
     r_width = renderTargetSize.width;
     r_height = renderTargetSize.height;
 
@@ -123,7 +124,9 @@ void init(RT_ ui::WindowDimensions windowSize, RT_ ui::WindowDimensions renderTa
     ui::setDarkTheme();
     
     renderer::init(renderTargetSize.width, renderTargetSize.height);
-
+    auto end = std::chrono::high_resolution_clock::now();
+    long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    rt_info("Core", "Initialization completed within ", (float)elapsed / 1000.0, " seconds");
     rt_info("Core", "Started mainloop");
     w.startMainLoop(mainloop);
 }
@@ -156,6 +159,7 @@ void mainloop(double frametime)
     ui::sceneView();
     ui::settingsPanel();
     ui::statisticsPanel();
+    std::this_thread::sleep_for(std::chrono::microseconds((long long) renderer::waitBetweenFramesMS * 1000));
 }
 
 void dispose()
@@ -192,12 +196,13 @@ int main(int argc, char** argv)
     }
     else if (argc == 1)
     {
-        rt_warn("Initializer", "No command line input given. Renderer will boot up using default values");
+        rt_warn("Initializer", "No command line input given. Renderer will boot up using default values (1920x1080)");
     }
+
 
     rt::init({ 1600, 900 }, {(float) w, (float) h});
     rt::dispose();
-
+    rt_info("Initializer", "Terminated application");
 
  	return 0;
 }

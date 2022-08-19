@@ -5,13 +5,23 @@
 #include "../imgui-docking/imgui.h"
 #include "../imgui-docking/imgui_impl_glfw.h"
 #include "../imgui-docking/imgui_impl_opengl3.h"
-
+#include "../imgui-docking/ImGuizmo.h"
 
 RT_START
 namespace ui {
 
     int selectedObject = 0;
     float fontsize = 15.5;
+
+    enum GizmoOperation
+    {
+        NONE = 0,
+        TRANSLATE = 1,
+        ROTATE = 2,
+        SCALE = 3
+    };
+
+    GizmoOperation selectedOperation = GizmoOperation::TRANSLATE;
 
     GL_ Texture checkerBoard, openFolder;
 
@@ -42,7 +52,7 @@ namespace ui {
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
             if (ImGui::Button(s[1]))
             {
-                data->y = 0;
+                data->y = resetValue.y;
                 r = true;
             }
             ImGui::PopStyleColor(3);
@@ -55,7 +65,7 @@ namespace ui {
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
             if (ImGui::Button(s[2]))
             {
-                data->z = 0;
+                data->z = resetValue.z;
                 r = true;
             }
             ImGui::PopStyleColor(3);
@@ -482,6 +492,7 @@ namespace ui {
             ImGui::Text("Renderer");
             ImGui::Text("Graphics processor");
             ImGui::Text("Active");
+            ImGui::Text("Wait between frames");
             ImGui::PopStyleVar();
             ImGui::NextColumn();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
@@ -490,6 +501,7 @@ namespace ui {
             ImGui::Combo("#renderer", &currentItem, gapis, 1);
             ImGui::Text((const char*)glGetString(GL_RENDERER));
             ImGui::Checkbox("##active", &renderer::active);
+            ImGui::DragFloat("##wait", &renderer::waitBetweenFramesMS, 0.01f, 0.0f, 100.0f);
             ImGui::PopItemWidth();
         }
         ImGui::Columns(1);
@@ -650,6 +662,7 @@ namespace ui {
             ImGui::Text("Focus point");
             ImGui::Text("Rotation (RAD)");
             ImGui::Text("Radius");
+            ImGui::Text("Up");
             ImGui::Text("Scroll sensititity");
             ImGui::PopStyleVar();
             ImGui::NextColumn();
@@ -724,8 +737,18 @@ namespace ui {
             ImGui::PopStyleVar();
             ImGui::PopItemWidth();
 
+
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
             ImGui::DragFloat("##Radius", &c.radius(), 0.01f, 0.01f, 100.0f);
+            const char* xyz[] = { "X", "Y", "Z" };
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x / 4);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, ImGui::GetStyle().ItemSpacing.y });
+            if (item::vec3Component("up", &renderer::c.up(), { 0,1,0 }, xyz))
+            {
+                renderer::c.update();
+            }
+            ImGui::PopItemWidth();
+            ImGui::PopStyleVar();
             ImGui::DragFloat("##Scrollsensitivity", &c.scrollSensitivity(), 0.01f, 0.05f, 2.0f);
             ImGui::PopItemWidth();
 
@@ -743,13 +766,13 @@ namespace ui {
         ImGui::Text("Geometry Buffer");
         ImGui::Separator();
         ImGui::Text("Albdeo");
-        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(0), {ImGui::GetContentRegionAvail().x, r_height/r_width * ImGui::GetContentRegionAvail().x });
+        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(0), {ImGui::GetContentRegionAvail().x, r_height/r_width * ImGui::GetContentRegionAvail().x }, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::Text("Position (World space)");
-        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(1), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x });
+        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(1), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x }, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::Text("Normal (World space)");
-        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(2), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x });
+        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(2), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x }, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::Text("Material");
-        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(3), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x });
+        ImGui::Image((ImTextureID)gBuffer.getTextureAttachment(3), { ImGui::GetContentRegionAvail().x, r_height / r_width * ImGui::GetContentRegionAvail().x }, ImVec2(0, 1), ImVec2(1, 0));
 
         ImGui::End();
     }
@@ -764,7 +787,50 @@ namespace ui {
         float w = ImGui::GetContentRegionAvail().x;
         float h = r_height / r_width * w;
 
-        ImGui::Image((ImTextureID) fb.getTextureAttachment(0), { w, h });
+        ImGui::Image((ImTextureID) fb.getTextureAttachment(0), { w, h }, ImVec2(0, 1), ImVec2(1, 0));
+
+
+        // ImGuizmo Transformation Gizmos
+
+        if (selectedOperation != GizmoOperation::NONE)
+        {
+            RT_ Object* object = &renderer::objects.at(selectedObject);
+            
+            ImGuizmo::SetOrthographic(false);
+            ImGuizmo::SetDrawlist();
+            ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, w, h);
+            const glm::mat4 camPr = renderer::c.projection();
+            const glm::mat4 camView = renderer::c.view();
+            const glm::mat4 objTr = object->getTransform();
+            const glm::mat4 matr = glm::mat4(1.0);
+            ImGuizmo::DrawGrid((float*)&camView, (float*)&camPr, (float*) &matr, 1.0f);
+            switch (selectedOperation)
+            {
+            case GizmoOperation::TRANSLATE:
+                
+                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                    ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, (float*)&objTr);
+                object->getPosition() = objTr[3];
+                break;
+            case GizmoOperation::ROTATE:
+
+                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                    ImGuizmo::OPERATION::ROTATE, ImGuizmo::LOCAL, (float*)&objTr);
+                break;
+            case GizmoOperation::SCALE:
+
+                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                    ImGuizmo::OPERATION::SCALE, ImGuizmo::LOCAL, (float*)&objTr);
+                float sx = glm::length(objTr[0]);
+                float sy = glm::length(objTr[1]);
+                float sz = glm::length(objTr[2]);
+                object->getScale() = { sx, sy, sz };
+                break;
+            }
+
+
+            object->updateTransform();
+        }
 
         ImGui::End();
         ImGui::PopStyleVar(2);
@@ -826,6 +892,7 @@ namespace ui {
             ImGui::PopStyleVar();
             ImGui::PopItemWidth();
             ImGui::Columns(1);
+
         }
 
         ImGui::End();

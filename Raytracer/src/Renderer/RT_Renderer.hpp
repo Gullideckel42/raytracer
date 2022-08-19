@@ -17,6 +17,7 @@ namespace renderer {
 	uint32_t totalFrames = 0;
 	unsigned int drawCalls = 0;
 	double lastFrameMS = 0.0;
+	float waitBetweenFramesMS = 2;
 	bool active = true;
 
 	struct RendererProperties
@@ -46,7 +47,13 @@ namespace renderer {
 	RT_ Camera c;
 	GL_ Mesh cube, quad;
 
+	struct MeshProperties
+	{
+		std::string name;
+	};
+
 	std::vector<GL_ Mesh> meshes;
+	std::vector<MeshProperties> meshProperties;
 	std::vector<RT_ Object> objects;
 	std::vector<RT_ PointLight> lights;
 
@@ -63,11 +70,12 @@ namespace renderer {
 		uint32_t cubeIndex[] = H3D_NORMAL_CUBE_INDICES;
 
 		const h3dgl::Vertex quadVertices[] = {
-			h3dgl::Vertex{-1,-1,0, 0,0, 0,0,1},
-			h3dgl::Vertex{-1, 1,0, 0,1, 0,0,1},
-			h3dgl::Vertex{ 1,-1,0, 1,0, 0,0,1},
-			h3dgl::Vertex{ 1, 1,0, 1,1, 0,0,1}
-		};
+            h3dgl::Vertex{-1,-1,0, 0,0, 0,0,1},
+            h3dgl::Vertex{-1, 1,0, 0,1, 0,0,1},
+            h3dgl::Vertex{ 1,-1,0, 1,0, 0,0,1},
+            h3dgl::Vertex{ 1, 1,0, 1,1, 0,0,1}
+        };
+
 		const uint32_t quadIndices[] = { 2,1,0, 2,3,1 }; // Counter clockwise
 
 		cube.load(cubeVertex, 8, cubeIndex, 36);
