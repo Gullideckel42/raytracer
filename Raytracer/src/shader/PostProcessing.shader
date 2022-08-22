@@ -23,8 +23,10 @@ uniform vec3 color_filter = vec3(1.0f);
 
 void main()
 {
-    vec3 clr = texture(frame, v_uv).rgb;
+    vec4 c = texture(frame, v_uv).rgba;
+    vec3 clr = c.rgb;
     clr = color_filter * clr;
     vec3 sw = vec3((clr.r + clr.g + clr.b) / 3.0f);
-    color = vec4(mix(sw, clr, saturation), 1.0f);
+
+    color = vec4(mix(sw, clr, saturation), c.a);
 }

@@ -36,7 +36,7 @@ void h3dgl::Mesh::loadFromFile(std::string path, unsigned int meshIndex) {
 	}
 	
 	load(l_vertices.data(), l_vertices.size(), l_indices.data(), l_indices.size());
-	rt_info("Mesh loader", "Loaded mesh (", vertexCount(), " vertices, ", indexCount(), " indices");
+	rt_info("Mesh loader", "Loaded mesh (vertex buffer: ", vertexCount(), " vertices, index buffer: ", indexCount(), " indices");
 }
 
 void h3dgl::Mesh::load(const h3dgl::Vertex* vertexData, unsigned int vertexCount, const uint32_t* indexData, unsigned int indexCount) {

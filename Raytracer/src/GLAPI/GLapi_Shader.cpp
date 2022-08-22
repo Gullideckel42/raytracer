@@ -15,7 +15,7 @@ unsigned int h3dgl::Shader::CompileShader(GLuint type, const std::string& source
         char* message = new char[length];
 
         GLCALL(glGetShaderInfoLog(id, length, &length, message));
-        rt_error("GL", "Failed to compile ", ((type == GL_VERTEX_SHADER) ? "vertex" : "fragment"), " shader: ", "\n", message);
+        rt_error("GL", message);
         delete[] message;
         GLCALL(glDeleteShader(id));
         return 0;
@@ -91,13 +91,26 @@ GLint h3dgl::Shader::getUniformLocation(const std::string& name) const {
 
 void h3dgl::Shader::create(const std::string& path, bool geometryShader) {
     hasGeometryShader = geometryShader;
+    m_path = path;
     h3dgl::Shader::ShaderProgramSource source = ParseShader(path);
     id = CreateShader(source.VertexSource, source.FragmentSource, source.geometryShaderSource);
     GLCALL(glUseProgram(0));
+    rt_info("GL", "Loaded shader: ", m_path);
+}
+
+void h3dgl::Shader::reload()
+{
+    destroy();
+    h3dgl::Shader::ShaderProgramSource source = ParseShader(m_path);
+    id = CreateShader(source.VertexSource, source.FragmentSource, source.geometryShaderSource);
+    m_uniformLocationsCache.clear();
+    GLCALL(glUseProgram(0));
+    rt_info("GL", "Reloaded shader: ", m_path);
 }
 
 void h3dgl::Shader::destroy() {
     GLCALL(glDeleteProgram(id));
+    rt_info("GL", "Deleted shader program: ", m_path);
 }
 
 GLuint h3dgl::Shader::Id() {

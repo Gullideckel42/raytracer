@@ -16,6 +16,7 @@ namespace h3dgl {
     class Shader {
     private:
         GLuint id;
+        std::string m_path = "";
         mutable std::unordered_map<std::string, GLint> m_uniformLocationsCache;
         unsigned int CompileShader(GLuint type, const std::string& source);
         bool hasGeometryShader;
@@ -34,6 +35,8 @@ namespace h3dgl {
     public:
 
         void create(const std::string& path, bool geometryShader=false);
+
+        void reload();
 
         void destroy();
 

@@ -3,7 +3,6 @@
 // Equirectangular 
 
 void h3dgl::EquirectangularMap::load(const std::string& path) {
-    std::cout << "Loading... equirectangularmap : " << path << std::endl;
     m_path = path;
     stbi_set_flip_vertically_on_load(true);
     GLCALL(glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS));
@@ -23,10 +22,9 @@ void h3dgl::EquirectangularMap::load(const std::string& path) {
     }
     else
     {
-        std::cout << "Failed to load HDR image." << std::endl;
+        rt_error("GL", "Failed to load cubemap");
         return;
     }
-    std::cout << "Loaded hdr image" << std::endl;
     // Convert to cubemap
 
     h3dgl::Mesh cube;
@@ -35,7 +33,7 @@ void h3dgl::EquirectangularMap::load(const std::string& path) {
     cube.load(cubeVertex, 8, cubeIndex, 36);
 
     h3dgl::Shader convertionShader;
-    convertionShader.create("src/shader/equiToCube.shader", false);
+    convertionShader.create("src/shader/EquiToCube.shader", false);
 
     unsigned int captureFBO, captureRBO;
     GLCALL(glGenFramebuffers(1, &captureFBO));
@@ -103,7 +101,7 @@ void h3dgl::EquirectangularMap::load(const std::string& path) {
     convertionShader.destroy();
     cube.destroy();
     m_loaded = true;
-    std::cout << "Loaded equirectangularmap : " << path << std::endl;
+    rt_info("GL", "Loaded and transformed environment map into cubemap format");
 }
 
 bool h3dgl::EquirectangularMap::isLoaded() {
@@ -114,7 +112,7 @@ void h3dgl::EquirectangularMap::destroy() {
     if (!m_loaded) return;
     GLCALL(glDeleteTextures(1, &m_cubemap));
     m_loaded = false;
-    std::cout << "Destroyed equirectangular map" << std::endl;
+    rt_info("GL", "Destroyed cubemap");
 }
 
 void h3dgl::EquirectangularMap::bind(unsigned int slot) const {
@@ -141,7 +139,8 @@ GLuint h3dgl::EquirectangularMap::getId() {
 
 // Not intended for realtime
 h3dgl::EquirectangularMap h3dgl::EquirectangularMap::convolute() const {
-    std::cout << "Start to convolute cubemap" << std::endl;
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     h3dgl::Shader convolutionShader;
     convolutionShader.create("src/shader/Convolution.shader");
     h3dgl::Mesh cube;
@@ -220,12 +219,16 @@ h3dgl::EquirectangularMap h3dgl::EquirectangularMap::convolute() const {
     map.m_loaded = true;
     map.m_path = "";
     map.m_bitsPerPixel = 3 * 8;
-    std::cout << "Done convolute cubemap" << std::endl;
+    auto t1 = std::chrono::high_resolution_clock::now();
+    long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    rt_info("GL", "Convoluted cubemap to diffuse iradiance map (Took ", ((double)elapsed / 1000.0), " seconds)");
     return map;
 }
 
 h3dgl::EquirectangularMap h3dgl::EquirectangularMap::prefilter() const {
-    std::cout << "Start to prefilter cubemap" << std::endl;
+    
+    auto t0 = std::chrono::high_resolution_clock::now();
+
     h3dgl::Shader prefilterShader;
     prefilterShader.create("src/shader/Prefilter.shader");
     h3dgl::Mesh cube;
@@ -312,7 +315,11 @@ h3dgl::EquirectangularMap h3dgl::EquirectangularMap::prefilter() const {
     map.m_loaded = true;
     map.m_path = "";
     map.m_bitsPerPixel = 3 * 8;
-    std::cout << "Done prefilter cubemap" << std::endl;
+    
+    auto t1 = std::chrono::high_resolution_clock::now();
+
+    long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0).count();
+    rt_info("GL", "Prefiltered cubemap (Took ", ((double)elapsed / 1000.0), " seconds)");
     return map;
 }
 

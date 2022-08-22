@@ -37,6 +37,9 @@ public:
 
 	void updateProj();
 
+	int& following() { return m_following; }
+
+	float movementspeed = 0.2f;
 private:
 
 	float m_mouseSensitivityX = 0.05;
@@ -47,6 +50,8 @@ private:
 	float m_far;
 	float m_width;
 	float m_height;
+
+	int m_following = -1;
 
 	float r = 3.0f;
 	glm::vec2 m_rotation = { 0, 0 };

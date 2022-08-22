@@ -12,6 +12,7 @@ namespace ui {
 
     int selectedObject = 0;
     float fontsize = 15.5;
+    bool grid = false;
 
     enum GizmoOperation
     {
@@ -21,9 +22,9 @@ namespace ui {
         SCALE = 3
     };
 
-    GizmoOperation selectedOperation = GizmoOperation::TRANSLATE;
+    GizmoOperation selectedOperation = GizmoOperation::NONE;
 
-    GL_ Texture checkerBoard, openFolder;
+    GL_ Texture checkerBoard, openFolder, pin, crosshair, crosshairRed;
 
     bool sceneViewFocused = false;
 
@@ -116,10 +117,16 @@ namespace ui {
     {
         checkerBoard.load("assets/images/Checkerboard.png");
         openFolder.load("assets/images/folder.png");
+        pin.load("assets/images/pin.png");
+        crosshair.load("assets/images/fokus.png");
+        crosshairRed.load("assets/images/fokusRed.png");
     }
 
     void dispose()
     {
+        crosshairRed.destroy();
+        crosshair.destroy();
+        pin.destroy();
         openFolder.destroy();
         checkerBoard.destroy();
     }
@@ -216,8 +223,8 @@ namespace ui {
         }
         if (ImGui::BeginMenu("Settings"))
         {
-            if (ImGui::MenuItem("Hide UI", "F")) {
-
+            if (ImGui::MenuItem("Toggle Grid", "G")) {
+                grid = !grid;
             }
             ImGui::EndMenu();
         }
@@ -225,6 +232,26 @@ namespace ui {
         {
             if (ImGui::MenuItem("Render frame", "F12")) {
                 rt_warn("UI", "Renderer not implemented yet");
+            }
+            if (ImGui::BeginMenu("Reload Shaders"))
+            {
+                if (ImGui::MenuItem("Geometry pass"))
+                {
+                    renderer::gShader.reload();
+                }
+                if (ImGui::MenuItem("Cubemap pass"))
+                {
+                    renderer::cubemapShader.reload();
+                }
+                if (ImGui::MenuItem("Lighting pass"))
+                {
+                    renderer::lShader.reload();
+                }
+                if (ImGui::MenuItem("Postprocessing pass"))
+                {
+                    renderer::pShader.reload();
+                }
+                ImGui::EndMenu();
             }
             ImGui::EndMenu();
         }
@@ -250,8 +277,6 @@ namespace ui {
         //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
     }
 
-
-
 	void propertiesPanel()
 	{
 		
@@ -274,6 +299,22 @@ namespace ui {
             }
             ImGui::SameLine();
             ImGui::Checkbox("##Visible", &obj->visible());
+            ImGui::SameLine();
+            if (ImGui::ImageButton((ImTextureID)pin.getId(), { 15,15 }, ImVec2(0, 1), ImVec2(1, 0)))
+            {
+                renderer::c.lookAt() = obj->getPosition();
+            }
+            ImGui::SameLine();
+            if (ImGui::ImageButton((ImTextureID)(selectedObject == renderer::c.following() ? crosshairRed.getId(): crosshair.getId()), { 15,15 }, ImVec2(0, 1), ImVec2(1, 0)))
+            {
+                if (renderer::c.following() == selectedObject)
+                {
+                    renderer::c.following() = -1;
+                }
+                else
+                    renderer::c.following() = selectedObject;
+                renderer::c.lookAt() = obj->getPosition();
+            }
 
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_SpanAvailWidth;
             float columnWidth = ImGui::CalcTextSize("_____________________").x;
@@ -454,19 +495,26 @@ namespace ui {
                 std::string objectName = (std::to_string(i) + " \t " + objects[i].getName());
                 if (ImGui::Selectable(objectName.c_str(), selectedObject == i))
                 {
-                    renderer::c.lookAt() = objects[i].getPosition();
                     selectedObject = i;
                 }
             }
         }
+        
+        bool b = ImGui::CollapsingHeader("Lights");
 
-        if (ImGui::CollapsingHeader("Lights"))
+        if (b)
         {
+            if (ImGui::Button("[+] New light"))
+            {
+                lights.push_back(RT_ PointLight{});
+            }
             for (int i = 0; i < lights.size(); i++)
             {
                 if (ImGui::Selectable((std::string("Light ") + std::to_string(i)).c_str(), selectedObject == (i + objects.size())))
                 {
                     selectedObject = i + objects.size();
+                    renderer::c.lookAt() = lights.at(selectedObject - objects.size()).position;
+                    
                 }
             }
         }
@@ -492,16 +540,75 @@ namespace ui {
             ImGui::Text("Renderer");
             ImGui::Text("Graphics processor");
             ImGui::Text("Active");
+            ImGui::Text("Clear");
             ImGui::Text("Wait between frames");
+            ImGui::Text("Clear Color");
+            ImGui::Text("Render light bulbs");
+            ImGui::Text("Light bulb scale");
             ImGui::PopStyleVar();
             ImGui::NextColumn();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
             static int currentItem;
             constexpr char* gapis[] = { "OpenGL", "Vulkan (not implemented)"};
-            ImGui::Combo("#renderer", &currentItem, gapis, 1);
+            ImGui::Combo("##renderer", &currentItem, gapis, 1);
             ImGui::Text((const char*)glGetString(GL_RENDERER));
             ImGui::Checkbox("##active", &renderer::active);
+            if (ImGui::Button("Clear"))
+            {
+                fb.bind();
+                glClearColor(renderer::clearColor.r, renderer::clearColor.g, renderer::clearColor.b, renderer::clearColor.a);
+                glClear(GL_COLOR_BUFFER_BIT);
+                fb.unbind();
+            }
             ImGui::DragFloat("##wait", &renderer::waitBetweenFramesMS, 0.01f, 0.0f, 100.0f);
+            ImGui::ColorEdit4("##clearcolor", &renderer::clearColor[0]);
+            ImGui::Checkbox("##lightBulbs", &renderer::renderlights);
+            ImGui::DragFloat("##lightscale", &renderer::lightScale, 0.0005f, 0.0001f, 0.2f);
+            ImGui::PopItemWidth();
+        }
+        ImGui::Columns(1);
+        if (ImGui::CollapsingHeader("Cubemap"))
+        {
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, columnWidth);
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 10, 10 });
+            ImGui::Text("Open");
+            ImGui::Text("Render");
+            ImGui::Text("Mip");
+            ImGui::Text("Prefiltered");
+            ImGui::Text("Specular IBL");
+            ImGui::Text("Diffuse Iradiance");
+            ImGui::PopStyleVar();
+            ImGui::NextColumn();
+            ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+            
+            if (ImGui::ImageButton((ImTextureID)openFolder.getId(), { 15,15 }, ImVec2(0, 1), ImVec2(1, 0)))
+            {
+                std::string path = util::filedialog::OpenFile(rt::w.handle(), "Texture (*.hdr, *.png, *.jpg, *.jpeg,)\0*.hdr;*.png;*.jpg;*.jpeg\0");
+                if (path != "___failed___")
+                {
+                    renderer::prefilteredCubemap.destroy();
+                    renderer::cubemap.destroy();
+                    renderer::iradianceMap.destroy();
+
+                    renderer::cubemap.load(path);
+                    renderer::prefilteredCubemap = renderer::cubemap.prefilter();
+                    renderer::iradianceMap = renderer::cubemap.convolute();
+#ifdef RT_PLATFORM_WINDOWS
+                    Sleep(1000);
+#else
+                    std::this_thread::sleep(std::chrono::seconds(1));
+#endif
+                }
+
+            }
+            ImGui::BeginDisabled(!renderer::cubemap.isLoaded());
+            ImGui::Checkbox("##rendercubemap", &renderer::renderCubemap);
+            ImGui::DragFloat("##cubemapmip", &renderer::cubemapMip, 0.001, 0.0, 5.0);
+            ImGui::Checkbox("##prefiltered", &renderer::prefilter);
+            ImGui::Checkbox("##specibl", &renderer::properties.iblSpecular);
+            ImGui::Checkbox("##diffibl", &renderer::properties.iblDiffuseIradiance);
+            ImGui::EndDisabled();
             ImGui::PopItemWidth();
         }
         ImGui::Columns(1);
@@ -564,6 +671,7 @@ namespace ui {
             ImGui::Text("Near Plane");
             ImGui::Text("Far Plane");
             ImGui::Text("Aspect Ratio");
+
             ImGui::PopStyleVar();
             ImGui::NextColumn();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
@@ -664,6 +772,7 @@ namespace ui {
             ImGui::Text("Radius");
             ImGui::Text("Up");
             ImGui::Text("Scroll sensititity");
+            ImGui::Text("Movement speed");
             ImGui::PopStyleVar();
             ImGui::NextColumn();
 
@@ -750,6 +859,7 @@ namespace ui {
             ImGui::PopItemWidth();
             ImGui::PopStyleVar();
             ImGui::DragFloat("##Scrollsensitivity", &c.scrollSensitivity(), 0.01f, 0.05f, 2.0f);
+            ImGui::DragFloat("##movementspeed", &c.movementspeed, 0.01f, 0.001f, 2.0f);
             ImGui::PopItemWidth();
 
 
@@ -780,7 +890,7 @@ namespace ui {
 	void sceneView()
 	{
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 5,5});
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0,2});
 		ImGui::Begin("Scene View");
         sceneViewFocused = ImGui::IsWindowFocused() || ImGui::IsWindowHovered();
 
@@ -789,37 +899,50 @@ namespace ui {
 
         ImGui::Image((ImTextureID) fb.getTextureAttachment(0), { w, h }, ImVec2(0, 1), ImVec2(1, 0));
 
-
         // ImGuizmo Transformation Gizmos
 
-        if (selectedOperation != GizmoOperation::NONE)
+        if (grid || (selectedOperation != GizmoOperation::NONE))
         {
-            RT_ Object* object = &renderer::objects.at(selectedObject);
-            
             ImGuizmo::SetOrthographic(false);
             ImGuizmo::SetDrawlist();
             ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, w, h);
-            const glm::mat4 camPr = renderer::c.projection();
-            const glm::mat4 camView = renderer::c.view();
-            const glm::mat4 objTr = object->getTransform();
+        }
+        const glm::mat4 camPr = renderer::c.projection();
+        const glm::mat4 camView = renderer::c.view();
+
+        if (grid)
+        {
+
             const glm::mat4 matr = glm::mat4(1.0);
-            ImGuizmo::DrawGrid((float*)&camView, (float*)&camPr, (float*) &matr, 1.0f);
+            ImGuizmo::DrawGrid((float*)&camView, (float*)&camPr, (float*)&matr, 15.0f);
+        }
+
+        if (selectedObject >= 0 && selectedObject < renderer::objects.size())
+        {
+            RT_ Object* object = &renderer::objects.at(selectedObject);
+            const glm::mat4 objTr = object->getTransform();
+            bool modified = false;
             switch (selectedOperation)
             {
             case GizmoOperation::TRANSLATE:
                 
-                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                modified |= ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
                     ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, (float*)&objTr);
                 object->getPosition() = objTr[3];
                 break;
             case GizmoOperation::ROTATE:
 
-                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                modified |= ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
                     ImGuizmo::OPERATION::ROTATE, ImGuizmo::LOCAL, (float*)&objTr);
+                glm::vec3 newRotation = glm::vec3(0.0f);
+                newRotation[0] = atan2f(objTr[1][2], objTr[2][2]);
+                newRotation[1] = atan2f(-objTr[0][2], sqrtf(objTr[1][2] * objTr[1][2] + objTr[2][2] * objTr[2][2]));
+                newRotation[2] = atan2f(objTr[0][1], objTr[0][0]);
+                object->getRotation() = newRotation;
                 break;
             case GizmoOperation::SCALE:
 
-                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                modified |= ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
                     ImGuizmo::OPERATION::SCALE, ImGuizmo::LOCAL, (float*)&objTr);
                 float sx = glm::length(objTr[0]);
                 float sy = glm::length(objTr[1]);
@@ -828,14 +951,34 @@ namespace ui {
                 break;
             }
 
+            if(modified)
+                object->updateTransform();
+        }
+        else
+        {
 
-            object->updateTransform();
+            rt::PointLight* light = &renderer::lights.at(selectedObject - renderer::objects.size());
+
+            glm::mat4 transform = glm::translate(glm::mat4(1.0f), light->position);
+
+            if (selectedOperation == ui::GizmoOperation::TRANSLATE)
+            {
+                ImGuizmo::Manipulate((float*)&camView, (float*)&camPr,
+                    ImGuizmo::OPERATION::TRANSLATE, ImGuizmo::LOCAL, (float*)&transform);
+                light->position = transform[3];
+            }
         }
 
         ImGui::End();
         ImGui::PopStyleVar(2);
 	}
 
+    void logPanel()
+    {
+        ImGui::Begin("Log");
+        
+        ImGui::End();
+    }
 
     void statisticsPanel()
     {

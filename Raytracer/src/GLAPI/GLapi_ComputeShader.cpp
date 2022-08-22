@@ -22,6 +22,7 @@ void h3dgl::ComputeShader::load(const std::string& path) {
 	GLCALL(m_program = glCreateProgram());
 	GLCALL(glAttachShader(m_program, m_computeshader));
 	GLCALL(glLinkProgram(m_program));
+	rt_info("GL", "Loaded compute shader");
 }
 
 std::string h3dgl::ComputeShader::ParseShader(const std::string& path) {
@@ -39,6 +40,7 @@ std::string h3dgl::ComputeShader::ParseShader(const std::string& path) {
 void h3dgl::ComputeShader::destroy() {
 	GLCALL(glDeleteShader(m_computeshader));
 	GLCALL(glDeleteProgram(m_program));
+	rt_info("GL", "Disposed compute shader");
 }
 
 void h3dgl::ComputeShader::dispatch(unsigned int w, unsigned int h, unsigned int d, GLuint barrier) {

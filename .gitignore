@@ -3,9 +3,11 @@ premake5.lua
 vendor/
 .vs/
 Raytracer/assets
+Raytracer/**.exe
 bin/
 bin-int/
 Raytracer/Raytracer.vcxproj.user
 renders/
 todo.md
 rcs/
+launch.bat

@@ -8,6 +8,11 @@ void h3dgl::Texture::load(const std::string& path) {
 	stbi_set_flip_vertically_on_load(true);
     
 	auto texBuffer = stbi_load(path.c_str(), &m_width, &m_height, &m_bitsPerPixel, 4);
+    if (!texBuffer)
+    {
+        rt_error("GL", "Unable to load texture file: ", path);
+        return;
+    }
     rt_info("GL", "Loaded texture: " , path.c_str() ,  ",Width: " , m_width , ", Height: " , m_height , "| bpp: " 
         , m_bitsPerPixel);
 	GLCALL(glGenTextures(1, &texture));

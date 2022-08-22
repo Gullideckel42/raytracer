@@ -85,6 +85,9 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+
+
+
 ////
 void main() {
 
@@ -159,9 +162,9 @@ void main() {
     vec3 clr = ambient + Lo;
 
     //clr = clr / (clr + vec3(1.0));
+
     if (toneMapping)
         clr = vec3(1.0) - exp(-clr * u_exposure);
-
     if(gammaCorrection)
         clr = pow(clr, vec3(1.0 / u_gamma));
 

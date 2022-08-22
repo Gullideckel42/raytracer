@@ -29,10 +29,11 @@ void h3dgl::Framebuffer::load(unsigned int width, unsigned int height, unsigned 
     }
     GLCALL(auto fboStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER));
     while (fboStatus != GL_FRAMEBUFFER_COMPLETE) {
-        std::cout << "Framebuffer not complete: " << fboStatus << std::endl;
+        rt_warn("GL", "Framebuffer not complete: ", fboStatus);
     }
     GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
     GLCALL(glBindFramebuffer(GL_FRAMEBUFFER, 0));
+    rt_info("GL", "Allocated framebuffer");
 }
 
 void h3dgl::Framebuffer::destroy() {
@@ -43,6 +44,7 @@ void h3dgl::Framebuffer::destroy() {
     
     GLCALL(glDeleteFramebuffers(1, &buffer));
     delete[] textureAttachments;
+    rt_info("GL", "Deallocated framebuffer");
 }
 
 void h3dgl::Framebuffer::bind() {
@@ -70,7 +72,7 @@ bool h3dgl::Framebuffer::saveToPng(const std::string& path, unsigned int target)
     GLCALL(glBindTexture(GL_TEXTURE_2D, textureAttachments[target]));
     GLCALL(glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data));
     GLCALL(glBindTexture(GL_TEXTURE_2D, 0));
-    stbi_flip_vertically_on_write(false);
+    stbi_flip_vertically_on_write(true);
     stbi_write_png(path.c_str(), m_width, m_height, numChannels, data, m_width * numChannels);
     free(data);
     return true;

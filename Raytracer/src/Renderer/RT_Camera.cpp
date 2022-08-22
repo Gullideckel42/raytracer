@@ -35,8 +35,8 @@ void RT_ Camera::rotate(float xRel, float yRel) {
 	m_rotation.x += xRel * m_mouseSensitivityX;
 	m_rotation.y += yRel * m_mouseSensitivityY;
 	
-	if (m_rotation.x >= 3.14159) m_rotation.x = 3.14159;
-	if (m_rotation.x <= 0.01) m_rotation.x = 0.01;
+	if (m_rotation.x >= RT_PI) m_rotation.x = RT_PI;
+	if (m_rotation.x <= 0.001) m_rotation.x = 0.001;
 
     update();
 }

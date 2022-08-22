@@ -12,11 +12,9 @@
     #define GLapi_OPENGLCALLS_DEBUG_ERROR_CHECK
     #ifdef GLapi_OPENGLCALLS_DEBUG_ERROR_CHECK
 
-    #define ASSERT(x) if (!(x)) __debugbreak()
-
     #define GLCALL(x) GLClearError();\
         x;\
-        ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+        GLLogCall(#x, __FILE__, __LINE__)
 
     static void GLClearError()
     {
@@ -56,7 +54,7 @@
 
         while (GLenum error = glGetError()) {
 
-            rt_error("GL", "{OpenGL Error 0x", std::hex, error, std::dec, "}: ", blue, function, reset, " at ", file, ":", yellow, line, reset,
+            rt_error("GL", "OpenGL Error 0x", std::hex, error, std::dec, ": ", blue, function, reset, " at ", file, ":", yellow, line, reset,
                 " -- ", red, GetGLErrorString(error), reset);
 
             //std::cout << red << "[OpenGL Error]" << reset << " (Code: 0x" << std::hex << error << std::dec << "; " << error << ") : "
@@ -65,8 +63,7 @@
             errorTriggered = true;
             errors++;
         }
-        if (errorTriggered) std::cout << std::endl << "Number of errors occurred: " << red << (int)errors << reset << std::endl
-            << "See " << blue << "https://docs.gl/" << reset << " for detailed information" << std::endl;
+
         return !errorTriggered;
     }
 

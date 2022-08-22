@@ -3,7 +3,7 @@
 
 RT_START
 
-#ifdef RT_DEBUG
+#if defined(RT_DEBUG) || defined (RT_RELEASE)
 #define rt_info(sender,...) RT_ log::log(RT_ log::LogLevel::RT_INFO, true, sender, __VA_ARGS__);
 #define rt_warn(sender,...) RT_ log::log(RT_ log::LogLevel::RT_WARNING, true, sender, __VA_ARGS__);
 #define rt_error(sender,...) RT_ log::log(RT_ log::LogLevel::RT_ERROR, true, sender, __VA_ARGS__);

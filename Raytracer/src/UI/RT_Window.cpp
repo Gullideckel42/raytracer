@@ -128,7 +128,7 @@ void RT_ ui::Window::startMainLoop(std::function<void(double)> f)
 		glfwSwapBuffers(m_window);
 		glfwPollEvents();
 		auto end = std::chrono::high_resolution_clock::now();
-		long long elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-		frametime = (double)elapsed;
+		long long elapsed = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+		frametime = (double)elapsed/1000.0;
 	}
 }

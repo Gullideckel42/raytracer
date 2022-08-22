@@ -114,6 +114,8 @@ uniform vec3 camPos;
 
 uniform float u_extend = 0.05;
 
+uniform bool lightBulb = false;
+
 void main() {
 
     g_position = vec4(v_position, 1.0f);
@@ -121,6 +123,20 @@ void main() {
 
     vec3 viewDirection = normalize(camPos - v_position);
     vec2 m_uv = v_uv;
+
+    if (lightBulb)
+    {
+        float tex = texture(deffuseMap, m_uv).a;
+        if (tex <= 0.1)
+            discard;
+        else
+        {
+            g_albedo = albedo;
+            g_normal = vec4(normalize(v_normal), 1.0f);
+            g_material = vec4(0.0, 0.0, 1.0,1.0);
+        }
+        return;
+    }
 
 
     // Geometry output

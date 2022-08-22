@@ -40,8 +40,12 @@ namespace ImGuizmo
    static const float ZPI = 3.14159265358979323846f;
    static const float RAD2DEG = (180.f / ZPI);
    static const float DEG2RAD = (ZPI / 180.f);
-   static float gGizmoSizeClipSpace = 0.15f;
-   const float screenRotateSize = 0.04f;
+   static float gGizmoSizeClipSpace = 0.1f;
+#define THICKNESS 3.5f
+#define CIRCLE_SIZE 8.0f
+#define CIRCLE_LINE_THICKNESS 4.f
+
+   const float screenRotateSize = 0.02f;
 
    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    // utility and math
@@ -1119,8 +1123,8 @@ namespace ImGuizmo
 
       gContext.mRadiusSquareCenter = screenRotateSize * gContext.mHeight;
 
-      constexpr float circleLineThickness = 6.0f;
-      constexpr float lineThickness = 6.0f;
+      constexpr float circleLineThickness = CIRCLE_LINE_THICKNESS;
+      constexpr float lineThickness = THICKNESS;
       for (int axis = 0; axis < 3; axis++)
       {
          ImVec2 circlePos[halfCircleSegmentCount];
@@ -1197,8 +1201,8 @@ namespace ImGuizmo
          scaleDisplay = gContext.mScale;
       }
 
-	  constexpr float lineThickness = 6.0f;
-	  constexpr float circleSize = 12.0f;
+	  constexpr float lineThickness = THICKNESS;
+	  constexpr float circleSize = CIRCLE_SIZE;
       for (unsigned int i = 0; i < 3; i++)
       {
          vec_t dirPlaneX, dirPlaneY, dirAxis;
@@ -1267,8 +1271,8 @@ namespace ImGuizmo
       // draw
       bool belowAxisLimit = false;
       bool belowPlaneLimit = false;
-      constexpr float arrowSize = 12.0f;
-      constexpr float lineThickness = 6.0f;
+      constexpr float arrowSize = CIRCLE_SIZE;
+      constexpr float lineThickness = THICKNESS;
       for (unsigned int i = 0; i < 3; ++i)
       {
          vec_t dirPlaneX, dirPlaneY, dirAxis;
