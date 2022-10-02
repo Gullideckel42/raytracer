@@ -86,7 +86,15 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 }
 
 
-
+vec3 ACESFilm(vec3 x)
+{
+    vec3 a = vec3(2.51f);
+    vec3 b = vec3(0.03f);
+    vec3 c = vec3(2.43f);
+    vec3 d = vec3(0.59f);
+    vec3 e = vec3(0.14f);
+    return clamp((x * (a * x + b)) / (x * (c * x + d) + e), 0.0, 1.0);
+}
 
 ////
 void main() {
@@ -163,10 +171,6 @@ void main() {
 
     //clr = clr / (clr + vec3(1.0));
 
-    if (toneMapping)
-        clr = vec3(1.0) - exp(-clr * u_exposure);
-    if(gammaCorrection)
-        clr = pow(clr, vec3(1.0 / u_gamma));
 
     color = vec4(clr, 1.0f);
 }

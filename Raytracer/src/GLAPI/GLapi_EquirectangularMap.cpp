@@ -33,7 +33,7 @@ void h3dgl::EquirectangularMap::load(const std::string& path) {
     cube.load(cubeVertex, 8, cubeIndex, 36);
 
     h3dgl::Shader convertionShader;
-    convertionShader.create("src/shader/EquiToCube.shader", false);
+    convertionShader.create("src/shader/cubemap/EquiToCube.shader", false);
 
     unsigned int captureFBO, captureRBO;
     GLCALL(glGenFramebuffers(1, &captureFBO));
@@ -142,7 +142,7 @@ h3dgl::EquirectangularMap h3dgl::EquirectangularMap::convolute() const {
     auto t0 = std::chrono::high_resolution_clock::now();
 
     h3dgl::Shader convolutionShader;
-    convolutionShader.create("src/shader/Convolution.shader");
+    convolutionShader.create("src/shader/cubemap/Convolution.shader");
     h3dgl::Mesh cube;
     h3dgl::Vertex vertices[] = H3D_CUBE_VERTICES(1.0, 1.0, 1.0);
     uint32_t indices[] = H3D_CUBE_INDICES;
@@ -230,7 +230,7 @@ h3dgl::EquirectangularMap h3dgl::EquirectangularMap::prefilter() const {
     auto t0 = std::chrono::high_resolution_clock::now();
 
     h3dgl::Shader prefilterShader;
-    prefilterShader.create("src/shader/Prefilter.shader");
+    prefilterShader.create("src/shader/cubemap/Prefilter.shader");
     h3dgl::Mesh cube;
     h3dgl::Vertex vertices[] = H3D_CUBE_VERTICES(1.0, 1.0, 1.0);
     uint32_t indices[] = H3D_CUBE_INDICES;

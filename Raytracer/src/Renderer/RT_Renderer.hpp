@@ -44,6 +44,8 @@ namespace renderer {
 
 		bool toneMapping = true;
 		bool gammaCorrection = true;
+
+		bool bloom = false;
 	};
 
 	RendererProperties properties;
@@ -68,6 +70,7 @@ namespace renderer {
 	struct MeshProperties
 	{
 		std::string name;
+		std::string path;
 	};
 
 	std::vector<GL_ Mesh> meshes;
@@ -150,26 +153,18 @@ namespace renderer {
 
 		// Object
 		meshes.push_back(GL_ Mesh());
-		meshes.push_back(GL_ Mesh());
-		objects.push_back(RT_ Object());
 		GL_ Vertex v[] = H3D_NORMAL_CUBE_VERTICES(1, 1, 1);
-		meshes[0].loadFromFile("assets/model/hirsch.obj");
-		meshes[1].loadFromFile("assets/model/sphere.obj");
-		objects.at(0).create("Cube", &meshes[0], { {0.1,1,0.4}, 0.2f, 0.0f });
-		objects.at(0).getPosition().z = -6;
-		objects.at(0).updateTransform();
-		objects.push_back(RT_ Object());
-		objects.at(1).create("Cube2", &meshes[0], { {1,0.2,0.2}, 0.1f, 1.0f });
-		objects.at(1).getPosition() = {2, -1, -5};
-		objects.at(1).updateTransform();
+		uint32_t cube_indices[] = H3D_NORMAL_CUBE_INDICES;
+		meshes[0].load(v, 24, cube_indices, 36);
+		meshProperties.push_back({ std::string("Cube Mesh"), std::string("internal")});
+
 
 		objects.push_back(RT_ Object());
-		objects.at(2).create("Sphere", &meshes[1], { {1,0.3,0.1}, 0.4f, 0.0f });
-		objects.at(2).getPosition() = { -2, 1, -3 };
-		objects.at(2).updateTransform();
+		objects.at(0).create("Hirsch", &meshes[0], { {0.6f,0.6f,0.6f}, 0.2f, 0.0f });
+		objects.at(0).updateTransform();
+
 
 		lights.push_back(PointLight{ {2,2,2}, {1,1,1}, 1.0f });
-		lights.push_back(PointLight{ {-2,2,-2}, {0.2,1,0.2}, 2.0f });
 
 		// Camera
 		c.create(90.0, rwidth, rheight, 0.1, 100.0);
@@ -318,10 +313,6 @@ namespace renderer {
 			cubemapShader.setMatrix4f("u_proj", renderer::c.projection());
 			cubemapShader.setMatrix4f("u_view", renderer::c.view());
 			cubemapShader.setUniform1f("u_mip", cubemapMip);
-			cubemapShader.setUniform1i("u_gammacorrection", renderer::properties.gammaCorrection);
-			cubemapShader.setUniform1i("u_toneMapping", renderer::properties.toneMapping);
-			cubemapShader.setUniform1f("u_exposure", renderer::properties.exposure);
-			cubemapShader.setUniform1f("u_gamma", renderer::properties.gamma);
 			cubemapShader.setUniform1i("u_cubemap", 0);
 			cubemap.bind(0);
 			if (prefilter) prefilteredCubemap.bind(0);
@@ -353,8 +344,7 @@ namespace renderer {
 		lShader.setMatrix4f("u_view", c.view());
 		lShader.setVector3f("camPos", c.position());
 
-		lShader.setUniform1f("u_gamma", properties.gamma);
-		lShader.setUniform1f("u_exposure", properties.exposure);
+
 		lShader.setUniform1f("u_ambient", properties.ambient);
 
 		// Lights (Hard coded yet)
@@ -380,8 +370,7 @@ namespace renderer {
 		glBindTexture(GL_TEXTURE_2D, brdfTexture);
 		iradianceMap.bind(11);
 		glActiveTexture(GL_TEXTURE0);
-		lShader.setUniform1i("toneMapping", properties.toneMapping);
-		lShader.setUniform1i("gammaCorrection", properties.gammaCorrection);
+
 
 		quad.bind();
 		GLCALL(glDrawElements(GL_TRIANGLES, quad.indexCount(), GL_UNSIGNED_INT, NULL));
@@ -412,7 +401,10 @@ namespace renderer {
 		GLCALL(glClearColor(0,0,0,0));
 		GLCALL(glClear(GL_COLOR_BUFFER_BIT));
 		pShader.use();
-
+		pShader.setUniform1f("u_gamma", properties.gamma);
+		pShader.setUniform1f("u_exposure", properties.exposure);
+		pShader.setUniform1i("toneMapping", properties.toneMapping);
+		pShader.setUniform1i("gammaCorrection", properties.gammaCorrection);
 		pShader.setUniform1i("frame", 0);
 		pShader.setUniform1f("saturation", properties.saturation);
 		pShader.setVector3f("color_filter", properties.filter);

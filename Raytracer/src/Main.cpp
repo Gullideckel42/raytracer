@@ -315,6 +315,7 @@ void mainloop(double frametime)
     ui::sceneView();
     ui::settingsPanel();
     ui::statisticsPanel();
+    ui::meshLoaderPanel();
 
 #ifdef RT_PLATFORM_WINDOWS
     Sleep(renderer::waitBetweenFramesMS);

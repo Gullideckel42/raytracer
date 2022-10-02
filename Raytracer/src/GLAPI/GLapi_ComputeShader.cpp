@@ -25,6 +25,13 @@ void h3dgl::ComputeShader::load(const std::string& path) {
 	rt_info("GL", "Loaded compute shader");
 }
 
+void h3dgl::ComputeShader::reload()
+{
+	GLCALL(glDeleteShader(m_computeshader));
+	GLCALL(glDeleteProgram(m_program));
+	load(m_path);
+}
+
 std::string h3dgl::ComputeShader::ParseShader(const std::string& path) {
 	std::ifstream stream(path);
 	std::string line;

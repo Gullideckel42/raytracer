@@ -251,6 +251,12 @@ namespace ui {
                 {
                     renderer::pShader.reload();
                 }
+
+                if (ImGui::MenuItem("Compute Shader"))
+                {
+                    renderer::compute.reload();
+                }
+
                 ImGui::EndMenu();
             }
             ImGui::EndMenu();
@@ -526,7 +532,7 @@ namespace ui {
 
     void settingsPanel()
     {
-        ImGui::ShowDemoWindow();
+        //ImGui::ShowDemoWindow();
         
         using renderer::c;
         ImGui::Begin("Scene Renderer");
@@ -594,6 +600,7 @@ namespace ui {
                     renderer::cubemap.load(path);
                     renderer::prefilteredCubemap = renderer::cubemap.prefilter();
                     renderer::iradianceMap = renderer::cubemap.convolute();
+                    // Sleep to preserve driver timeout
 #ifdef RT_PLATFORM_WINDOWS
                     Sleep(1000);
 #else
@@ -1040,6 +1047,25 @@ namespace ui {
 
         ImGui::End();
 
+    }
+
+    void meshLoaderPanel()
+    {
+        ImGui::Begin("Mesh loader");
+
+        ImGui::Text("Import Mesh");
+        ImGui::Separator();
+
+        for (int i = 0; i < renderer::meshProperties.size(); i++)
+        {
+            ImGui::Text(renderer::meshProperties[i].name.c_str());
+            ImGui::SameLine();
+            ImGui::Text(renderer::meshProperties[i].path.c_str());
+        }
+
+        
+
+        ImGui::End();
     }
 
 }

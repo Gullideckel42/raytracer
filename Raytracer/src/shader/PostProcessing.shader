@@ -21,10 +21,21 @@ uniform sampler2D frame;
 uniform float saturation = 1.0f;
 uniform vec3 color_filter = vec3(1.0f);
 
+uniform bool toneMapping;
+uniform bool gammaCorrection;
+uniform float u_gamma;
+uniform float u_exposure;
+
 void main()
 {
     vec4 c = texture(frame, v_uv).rgba;
     vec3 clr = c.rgb;
+
+    if (toneMapping)
+        clr = vec3(1.0) - exp(-clr * u_exposure);
+    if (gammaCorrection)
+        clr = pow(clr, vec3(1.0 / u_gamma));
+
     clr = color_filter * clr;
     vec3 sw = vec3((clr.r + clr.g + clr.b) / 3.0f);
 

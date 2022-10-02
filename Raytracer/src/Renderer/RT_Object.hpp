@@ -65,9 +65,10 @@ private:
 	std::string m_name;
 	bool m_wireframe = false;
 	bool m_backfaceCulling = true;
-	bool m_backfaceCullingmode = false; // false ^= clockwise; true ^= counterclockwise
+	bool m_backfaceCullingmode = false; // false: clockwise; true: counterclockwise
 	bool m_depthTesting = true;
 	bool m_smoothShaded = false;
+
 };
 
 

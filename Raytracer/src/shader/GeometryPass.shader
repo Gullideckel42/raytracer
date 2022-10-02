@@ -133,7 +133,7 @@ void main() {
         {
             g_albedo = albedo;
             g_normal = vec4(normalize(v_normal), 1.0f);
-            g_material = vec4(0.0, 0.0, 1.0,1.0);
+            g_material = vec4(10.0, 0.0, 1.0,1.0);
         }
         return;
     }
